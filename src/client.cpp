@@ -25,6 +25,11 @@ int main(int argc, char **argv) {
   // Open a window with specified dimensions
   GLT::Window window = GLT::Window(wSize[0], wSize[1], "mpibrot");
 
+  // Load shaders
+  GLT::ShaderProgram shader({
+    GLT::Shader(GL_VERTEX_SHADER, "data/shaders/vs.glsl"),
+    GLT::Shader(GL_FRAGMENT_SHADER, "data/shaders/fs.glsl")});
+
   // Draw loop
   while(!window.ShouldClose()) {
     window.Refresh();
