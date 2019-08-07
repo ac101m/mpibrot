@@ -5,6 +5,7 @@
 
 // Internal
 #include "util/Options.hpp"
+#include "draw/Image.hpp"
 
 // External
 #include "GLT/Window.hpp"
@@ -29,8 +30,14 @@ int main(int argc, char **argv) {
     GLT::Shader(GL_VERTEX_SHADER, "data/shaders/vs.glsl"),
     GLT::Shader(GL_FRAGMENT_SHADER, "data/shaders/fs.glsl")});
 
+  // Create orbit texture
+  Image image(wSize[0], wSize[1]);
+
   // Draw loop
   while(!window.ShouldClose()) {
+    image.Random();
+    image.Update();
+    image.Draw(shader);
     window.Refresh();
   }
 
