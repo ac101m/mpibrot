@@ -7,7 +7,6 @@ uniform sampler2D texture0;
 
 // Inputs from vertex shader
 in VS_OUT {
-  vec3 fragPos;
   vec2 fragUV;
 } fsIn;
 

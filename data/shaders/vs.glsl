@@ -11,7 +11,6 @@ layout (location = 4) in vec3 vertBitan;
 
 // Outputs from the vertex shader
 out VS_OUT {
-  vec3 fragPos;
   vec2 fragUV;
 } vsOut;
 
