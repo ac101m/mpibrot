@@ -46,6 +46,9 @@ public:
 
   void Resize(unsigned const width, unsigned const height);
 
+  // Get routine for indexing, serves as get and set
+  pixel_t& Get(unsigned const x, unsigned const y) {return indices[y][x];}
+
   // Fill with random pixels
   void Random();
 
