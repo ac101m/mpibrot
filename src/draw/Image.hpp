@@ -32,6 +32,12 @@ private:
 
   // Image data
   std::vector<pixel_t> data;
+  std::vector<pixel_t*> indices;
+
+//====[METHODS]==============================================================//
+
+  // Initialise internal arrays
+  void InitStorage();
 
 public:
 

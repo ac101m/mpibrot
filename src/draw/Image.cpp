@@ -4,6 +4,20 @@
 #include <stdlib.h>
 
 
+// Initialise internal arrays
+void Image::InitStorage() {
+
+  // Initialise bulk storage
+  this->data = std::vector<pixel_t>(this->width * this->height);
+
+  // Initialise storage row indices
+  this->indices = std::vector<pixel_t*>(this->height);
+  for(unsigned i = 0; i < this->indices.size(); i++) {
+    this->indices[i] = &this->data[i * this->width];
+  }
+}
+
+
 // Initialise the things
 Image::Image(unsigned const width, unsigned const height) :
   GLT::Texture2D(0, GL_RGB, width, height, GL_RGB, GL_UNSIGNED_BYTE, NULL),
@@ -22,7 +36,7 @@ Image::Image(unsigned const width, unsigned const height) :
   this->vertexArray = GLT::VertexArray(vertices, indices);
 
   // Allocate data memory
-  this->data = std::vector<pixel_t>(width * height);
+  this->InitStorage();
 }
 
 
