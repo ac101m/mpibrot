@@ -24,6 +24,7 @@ int main(int argc, char **argv) {
 
   // Open a window with specified dimensions
   GLT::Window window = GLT::Window(wSize[0], wSize[1], "mpibrot");
+  window.MakeCurrent();
 
   // Load shaders
   GLT::ShaderProgram shader({
