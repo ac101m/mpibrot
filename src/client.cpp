@@ -2,7 +2,6 @@
 // Standard
 #include <vector>
 #include <iostream>
-#include "unistd.h"
 
 // Internal
 #include "util/Options.hpp"
