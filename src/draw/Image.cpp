@@ -69,7 +69,7 @@ void Image::Resize(unsigned const width, unsigned const height) {
   this->Unbind();
 
   // Regenerate data array
-  this->data = std::vector<pixel_t>(width * height);
+  this->InitStorage();
 }
 
 
