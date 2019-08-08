@@ -75,11 +75,12 @@ void Image::Resize(unsigned const width, unsigned const height) {
 
 // Random orbit texture data
 void Image::Random() {
-  for(unsigned i = 0; i < this->height; i++) {
-    for(unsigned j = 0; j < this->width; j++) {
-      this->Get(j, i).r = rand() % 255;
-      this->Get(j, i).g = rand() % 255;
-      this->Get(j, i).b = rand() % 255;
+  for(unsigned j = 0; j < this->height; j++) {
+    for(unsigned i = 0; i < this->width; i++) {
+      unsigned r = rand();
+      this->Get(i, j).r = r % 255;
+      this->Get(i, j).g = (r >> 8) % 255;
+      this->Get(i, j).b = (r >> 16)  % 255;
     }
   }
 }
