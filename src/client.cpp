@@ -47,12 +47,13 @@ int main(int argc, char **argv) {
   std::complex<float> brotEnd = center + std::complex<float>(2, 1.5);
 
   // Maximum number of iterations
-  unsigned maxIterations = 1024;
+  unsigned maxIterations = 64;
   unsigned bailout = 2;
+  unsigned superSampling = 4;
 
   // Compute iterations for all pixels
   SimpleBrot::ComputeIterations(
-    iterationMap, brotStart, brotEnd, maxIterations, bailout);
+    iterationMap, brotStart, brotEnd, maxIterations, bailout, superSampling);
 
 //====[TEMPORARY]============================================================//
 
