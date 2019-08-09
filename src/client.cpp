@@ -1,14 +1,14 @@
 
-// Standard
-#include <vector>
-#include <iostream>
-
 // Internal
 #include "util/Options.hpp"
 #include "draw/Image.hpp"
 
 // External
 #include "GLT/Window.hpp"
+
+// Standard
+#include <vector>
+#include <iostream>
 
 
 // Lets get this show on the road
