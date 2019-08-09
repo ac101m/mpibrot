@@ -10,8 +10,8 @@ template<class T>
 class Buffer2D {
 private:
 
-  unsigned const width;
-  unsigned const height;
+  unsigned width;
+  unsigned height;
 
   std::vector<T> data;
   std::vector<T*> indices;
