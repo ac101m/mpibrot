@@ -18,6 +18,9 @@ private:
 
 public:
 
+  // Don't initialise buffer
+  Buffer2D() : width(0), height(0) {}
+
   // Initialise buffer
   Buffer2D(unsigned const width, unsigned const height) :
     data(std::vector<T>(width * height)),
