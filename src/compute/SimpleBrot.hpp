@@ -20,8 +20,9 @@ namespace SimpleBrot {
     std::complex<T> z;
     unsigned iterationCount = 0;
 
-    while(abs(z) < bailout && ++iterationCount < maxIterations) {
+    while(abs(z) < bailout && iterationCount < maxIterations) {
       z = pow(z, 2) + c;
+      iterationCount++;
     }
 
     return iterationCount;
