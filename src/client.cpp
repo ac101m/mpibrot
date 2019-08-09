@@ -2,6 +2,7 @@
 // Internal
 #include "util/Options.hpp"
 #include "draw/Image.hpp"
+#include "compute/SimpleBrot.hpp"
 
 // External
 #include "GLT/Window.hpp"
@@ -22,8 +23,12 @@ int main(int argc, char **argv) {
     exit(1);
   }
 
+  // Rename window size to be less annoying to work with
+  int& width = wSize[0];
+  int& height = wSize[1];
+
   // Open a window with specified dimensions
-  GLT::Window window = GLT::Window(wSize[0], wSize[1], "mpibrot");
+  GLT::Window window = GLT::Window(width, height, "mpibrot");
   window.MakeCurrent();
 
   // Load shaders
@@ -31,13 +36,41 @@ int main(int argc, char **argv) {
     GLT::Shader(GL_VERTEX_SHADER, "data/shaders/vs.glsl"),
     GLT::Shader(GL_FRAGMENT_SHADER, "data/shaders/fs.glsl")});
 
-  // Create orbit texture
-  Image image(wSize[0], wSize[1]);
+//====[TEMPORARY]============================================================//
+
+  // Create image texture
+  Buffer2D<unsigned> iterationMap(width, height);
+
+  // View positioning
+  std::complex<float> center(-0.5, 0);
+  std::complex<float> brotStart = center + std::complex<float>(-2, -1.5);
+  std::complex<float> brotEnd = center + std::complex<float>(2, 1.5);
+
+  // Maximum number of iterations
+  unsigned maxIterations = 1024;
+  unsigned bailout = 2;
+
+  // Compute iterations for all pixels
+  SimpleBrot::ComputeIterations(
+    iterationMap, brotStart, brotEnd, maxIterations, bailout);
+
+//====[TEMPORARY]============================================================//
+
+  // Compute a mandelbrot image from iteration map
+  Image image(width, height);
+  for(int i = 0; i < height; i++) {
+    for(int j = 0; j < width; j++) {
+      float m = ((float)iterationMap.Get(j, i) / (float)maxIterations);
+      unsigned char mag = m * 255;
+      image.Get(j, i) = {mag, mag, mag};
+    }
+  }
+
+  // Update internal opengl texture
+  image.Update();
 
   // Draw loop
   while(!window.ShouldClose()) {
-    image.Random();
-    image.Update();
     image.Draw(shader);
     window.Refresh();
   }
