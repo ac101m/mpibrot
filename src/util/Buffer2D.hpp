@@ -23,9 +23,9 @@ public:
 
   // Initialise buffer
   Buffer2D(unsigned const width, unsigned const height) :
+    width(width), height(height),
     data(std::vector<T>(width * height)),
-    indices(std::vector<T*>(height)),
-    width(width), height(height) {
+    indices(std::vector<T*>(height)) {
 
     // Initialise row indices
     for(unsigned i = 0; i < this->indices.size(); i++) {
