@@ -1,6 +1,9 @@
 # Release targets
-TARGET_RELEASE ?= bin/client
-TARGET_DEBUG ?= bin/client-debug
+OUTPUT_DIR := bin
+CLIENT_RELEASE_TARGET ?= $(OUTPUT_DIR)/mpigrav-client
+CLIENT_DEBUG_TARGET ?= $(OUTPUT_DIR)/mpigrav-client-debug
+SERVER_RELEASE_TARGET ?= $(OUTPUT_DIR)/mpigrav-server
+SERVER_DEBUG_TARGET ?= $(OUTPUT_DIR)/mpigrav-server-debug
 
 # Directory controls
 OBJ_DIR ?= build
@@ -8,46 +11,86 @@ SRC_DIR ?= src
 INC_DIRS ?= src include
 RESOURCE_DIR ?= data
 
-# Compiler configuration
+#====[COMPILER BEHAVIOUR]=====================================================#
 CXX := g++
-FLAGS_BASE ?= -MMD -MP -m64 -std=c++14 -Wall
-FLAGS_RELEASE ?= $(FLAGS_BASE) -O3
-FLAGS_DEBUG ?= $(FLAGS_BASE) -g
+MPICXX := mpicxx
 INC_FLAGS ?= -Iinclude -Isrc
-LD_FLAGS ?= -loptparse -lgltools -lGLEW -lglfw -lGL
+COMMON_FLAGS ?= -MMD -MP -m64 -std=c++14 -Wall
+DEBUG_FLAGS ?= $(FLAGS_BASE) -g
+RELEASE_FLAGS ?= $(FLAGS_BASE) -O3
+COMMON_LD_FLAGS := -loptparse
+CLIENT_LD_FLAGS := $(COMMON_LD_FLAGS) -lgltools -lGLEW -lglfw -lGL
+SERVER_LD_FLAGS := $(COMMON_LD_FLAGS)
 
-# Enumerate sources
-SRCS := $(shell find $(SRC_DIR) -name *.cpp)
-OBJS_RELEASE := $(SRCS:%=$(OBJ_DIR)/release/%.o)
-OBJS_DEBUG := $(SRCS:%=$(OBJ_DIR)/debug/%.o)
-DEPS := $(OBJS_DEBUG:.o=.d) $(OBJS_RELEASE:.o=.d)
+#====[SOURCE AND OBJECT ENUMERATION]==========================================#
+# Find paths to all but main sources
+NON_MAIN_SRCS := $(shell find $(SRC_DIRS) -mindepth 3 -name *.cpp)
 
-# Release object compilation
-$(OBJ_DIR)/release/%.cpp.o: %.cpp
+# Client sources and objects (nothing from compute directory)
+CLIENT_SRCS := $(shell echo $(NON_MAIN_SRCS) | grep -v /compute/) src/client.cpp
+CLIENT_DEBUG_OBJS := $(CLIENT_SRCS:%=$(OBJ_DIR)/client-debug/%.o)
+CLIENT_RELEASE_OBJS := $(CLIENT_SRCS:%=$(OBJ_DIR)/client-release/%.o)
+
+# Server sources and objects (nothing from draw directory)
+SERVER_SRCS := $(shell echo $(NON_MAIN_SRCS) | grep -v /draw/) src/server.cpp
+SERVER_DEBUG_OBJS := $(SERVER_SRCS:%=$(OBJ_DIR)/server-debug/%.o)
+SERVER_RELEASE_OBJS := $(SERVER_SRCS:%=$(OBJ_DIR)/server-release/%.o)
+
+# Header dependencies (all of them)
+DEPS := $(CLIENT_DEBUG_OBJS:.o=.d) $(SERVER_DEBUG_OBJS:.o=.d)
+
+#====[CLIENT OBJECT COMPILATION]==============================================#
+# Debug
+$(OBJ_DIR)/client-debug/%.cpp.o: %.cpp
 	@$(MKDIR_P) $(dir $@)
-	$(CXX) $(FLAGS_RELEASE) $(INC_FLAGS) -c $< -o $@
+	$(CXX) $(DEBUG_FLAGS) $(INC_FLAGS) -c $< -o $@
 
-# Debug object compilation
-$(OBJ_DIR)/debug/%.cpp.o: %.cpp
+# Release
+$(OBJ_DIR)/client-release/%.cpp.o: %.cpp
 	@$(MKDIR_P) $(dir $@)
-	$(CXX) $(FLAGS_DEBUG) $(INC_FLAGS) -c $< -o $@
+	$(CXX) $(RELEASE_FLAGS) $(INC_FLAGS) -c $< -o $@
 
-# Release target
-release: copy_resources $(OBJS_RELEASE)
-	@$(MKDIR_P) $(dir $(TARGET_RELEASE))
-	$(CXX) $(OBJS_RELEASE) -o $(TARGET_RELEASE) $(LD_FLAGS)
+#====[SERVER OBJECT COMPILATION]==============================================#
+# Debug
+$(OBJ_DIR)/server-debug/%.cpp.o: %.cpp
+	@$(MKDIR_P) $(dir $@)
+	$(MPICXX) $(DEBUG_FLAGS) $(INC_FLAGS) -c $< -o $@
 
-# Release target
-debug: copy_resources $(OBJS_DEBUG)
-	@$(MKDIR_P) $(dir $(TARGET_DEBUG))
-	$(CXX) $(OBJS_DEBUG) -o $(TARGET_DEBUG) $(LD_FLAGS)
+# Release
+$(OBJ_DIR)/server-release/%.cpp.o: %.cpp
+	@$(MKDIR_P) $(dir $@)
+	$(MPICXX) $(RELEASE_FLAGS) $(INC_FLAGS) -c $< -o $@
+
+#====[BUILD TARGETS]==========================================================#
+
+# Client debug target
+client_debug: $(CLIENT_DEBUG_OBJS) copy_resources
+	@$(MKDIR_P) $(dir $(CLIENT_DEBUG_TARGET))
+	$(CXX) $(CLIENT_DEBUG_OBJS) -o $(CLIENT_DEBUG_TARGET) $(CLIENT_LD_FLAGS)
+
+# Client release target
+client_release: $(CLIENT_RELEASE_OBJS) copy_resources
+	@$(MKDIR_P) $(dir $(CLIENT_RELEASE_TARGET))
+	$(CXX) $(CLIENT_RELEASE_OBJS) -o $(CLIENT_RELEASE_TARGET) $(CLIENT_LD_FLAGS)
+
+# Server debug target
+server_debug: $(SERVER_DEBUG_OBJS) copy_resources
+	@$(MKDIR_P) $(dir $(SERVER_DEBUG_TARGET))
+	$(MPICXX) $(SERVER_DEBUG_OBJS) -o $(SERVER_DEBUG_TARGET) $(SERVER_LD_FLAGS)
+
+# Server release target
+server_release: $(SERVER_RELEASE_OBJS) copy_resources
+	@$(MKDIR_P) $(dir $(SERVER_RELEASE_TARGET))
+	$(MPICXX) $(SERVER_RELEASE_OBJS) -o $(SERVER_RELEASE_TARGET) $(SERVER_LD_FLAGS)
 
 # Collect all resource files in the bin directors
 copy_resources:
-	@$(MKDIR_P) $(dir $(TARGET_RELEASE))
-	cp -r $(RESOURCE_DIR) $(dir $(TARGET_RELEASE))
+	@$(MKDIR_P) $(OUTPUT_DIR)
+	cp -r $(RESOURCE_DIR) $(OUTPUT_DIR)
 
-# Build everything
+# Agregate build targets
+release: server_release client_release
+debug: server_debug client_debug
 all: release debug
 
 # Clean, be careful with this
