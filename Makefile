@@ -16,8 +16,8 @@ CXX := g++
 MPICXX := mpicxx
 INC_FLAGS ?= -Iinclude -Isrc
 COMMON_FLAGS ?= -MMD -MP -m64 -std=c++14 -Wall
-DEBUG_FLAGS ?= $(FLAGS_BASE) -g
-RELEASE_FLAGS ?= $(FLAGS_BASE) -O3
+DEBUG_FLAGS ?= $(COMMON_FLAGS) -g
+RELEASE_FLAGS ?= $(COMMON_FLAGS) -O3
 COMMON_LD_FLAGS := -loptparse
 CLIENT_LD_FLAGS := $(COMMON_LD_FLAGS) -lgltools -lGLEW -lglfw -lGL
 SERVER_LD_FLAGS := $(COMMON_LD_FLAGS)
@@ -37,7 +37,8 @@ SERVER_DEBUG_OBJS := $(SERVER_SRCS:%=$(OBJ_DIR)/server-debug/%.o)
 SERVER_RELEASE_OBJS := $(SERVER_SRCS:%=$(OBJ_DIR)/server-release/%.o)
 
 # Header dependencies (all of them)
-DEPS := $(CLIENT_DEBUG_OBJS:.o=.d) $(SERVER_DEBUG_OBJS:.o=.d)
+SERVER_DEPS := $(SERVER_DEBUG_OBJS:.o=.d) $(SERVER_RELEASE_OBJS:.o=.d)
+CLIENT_DEPS := $(CLIENT_DEBUG_OBJS:.o=.d) $(CLIENT_RELEASE_OBJS:.o=.d)
 
 #====[CLIENT OBJECT COMPILATION]==============================================#
 # Debug
@@ -99,7 +100,7 @@ clean:
 	@$(RM) -rv $(OBJ_DIR)
 
 # Include dependencies
--include $(DEPS)
+-include $(SERVER_DEPS) $(CLIENT_DEPS)
 
 # Make directory
 MKDIR_P ?= mkdir -p
