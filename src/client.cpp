@@ -14,7 +14,7 @@
 
 // Lets get this show on the road
 int main(int argc, char **argv) {
-  OptionParser opt = GenOptionParser(argc, argv);
+  OptionParser opt = GenClientOptionParser(argc, argv);
 
   // Get window dimensions
   std::vector<int> wSize = opt.Get("window-resolution");
