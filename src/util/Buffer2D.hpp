@@ -8,7 +8,7 @@
 
 template<class T>
 class Buffer2D {
-private:
+protected:
 
   unsigned width;
   unsigned height;
