@@ -33,6 +33,19 @@ public:
     }
   }
 
+  // Resize the buffer, destroys data
+  void Resize(unsigned const width, unsigned const height) {
+    this->width = width;
+    this->height = height;
+    this->data = std::vector<T>(width * height);
+    this->indices = std::vector<T*>(height);
+
+    // Initialise row indices
+    for(unsigned i = 0; i < this->indices.size(); i++) {
+      this->indices[i] = &this->data[i * width];
+    }
+  }
+
   // Size gets
   unsigned Width() {return this->width;}
   unsigned Height() {return this->height;}
