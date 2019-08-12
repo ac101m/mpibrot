@@ -60,4 +60,4 @@ public:
 };
 
 
-#endif // MPIBROT_ORBITTEXTURE_INCLUDED
+#endif // MPIBROT_IMAGE_INCLUDED
