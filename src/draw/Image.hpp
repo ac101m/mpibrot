@@ -10,6 +10,7 @@
 #include "GLT/GL/ShaderProgram.hpp"
 #include "GLT/GL/VertexArray.hpp"
 #include "GLT/GL/Texture2D.hpp"
+#include "util/Buffer2D.hpp"
 
 
 // Struct for pixel data
@@ -21,23 +22,11 @@ typedef struct {
 
 
 // Contains a texture representative
-class Image : public GLT::Texture2D {
+class Image : public GLT::Texture2D, public Buffer2D<pixel_t> {
 private:
 
   // Vertex data
   GLT::VertexArray vertexArray;
-
-  // Size of image
-  unsigned width, height;
-
-  // Image data
-  std::vector<pixel_t> data;
-  std::vector<pixel_t*> indices;
-
-//====[METHODS]==============================================================//
-
-  // Initialise internal arrays
-  void InitStorage();
 
 public:
 
@@ -45,9 +34,6 @@ public:
   Image(unsigned const width, unsigned const height);
 
   void Resize(unsigned const width, unsigned const height);
-
-  // Get routine for indexing, serves as get and set
-  pixel_t& Get(unsigned const x, unsigned const y) {return indices[y][x];}
 
   // Fill with random pixels
   void Random();

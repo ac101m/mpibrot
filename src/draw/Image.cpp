@@ -4,24 +4,10 @@
 #include <stdlib.h>
 
 
-// Initialise internal arrays
-void Image::InitStorage() {
-
-  // Initialise bulk storage
-  this->data = std::vector<pixel_t>(this->width * this->height);
-
-  // Initialise storage row indices
-  this->indices = std::vector<pixel_t*>(this->height);
-  for(unsigned i = 0; i < this->indices.size(); i++) {
-    this->indices[i] = &this->data[i * this->width];
-  }
-}
-
-
 // Initialise the things
 Image::Image(unsigned const width, unsigned const height) :
   GLT::Texture2D(0, GL_RGB, width, height, GL_RGB, GL_UNSIGNED_BYTE, NULL),
-  width(width), height(height) {
+  Buffer2D(width, height) {
 
   // Vertex positions, UVs and indices
   std::vector<GLT::vertex_t> const vertices = {
@@ -34,9 +20,6 @@ Image::Image(unsigned const width, unsigned const height) :
 
   // Initialise vertex array
   this->vertexArray = GLT::VertexArray(vertices, indices);
-
-  // Allocate data memory
-  this->InitStorage();
 }
 
 
@@ -44,9 +27,8 @@ Image::Image(unsigned const width, unsigned const height) :
 void Image::Resize(unsigned const width, unsigned const height) {
   this->Bind();
 
-  // Update size
-  this->width = width;
-  this->height = height;
+  // Update data size
+  Buffer2D<pixel_t>::Resize(width, height);
 
   // Update texture
   glTexImage2D(
@@ -67,9 +49,6 @@ void Image::Resize(unsigned const width, unsigned const height) {
   }
 
   this->Unbind();
-
-  // Regenerate data array
-  this->InitStorage();
 }
 
 
