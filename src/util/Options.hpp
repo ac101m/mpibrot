@@ -5,9 +5,11 @@
 #include "optparse.hpp"
 
 
-// Create option parser
-OptionParser GenOptionParser(int argc, char** argv) {
-  OptionParser opt(argc, argv, "Parallel mandelbrot zoom generator for clusters");
+// Client options
+OptionParser GenClientOptionParser(int argc, char** argv) {
+  OptionParser opt(
+    argc, argv,
+    "Parallel mandelbrot zoom generator for clusters - client");
 
   // Viewing window resolution option
   opt.Add(Option(
@@ -15,7 +17,22 @@ OptionParser GenOptionParser(int argc, char** argv) {
     "Screen resolution for window",
     {"1024", "768"}));
 
-  // Return the constructed option parser
+  return opt;
+}
+
+
+// Server options
+OptionParser GenServerOptionParser(int argc, char** argv) {
+  OptionParser opt(
+    argc, argv,
+    "Parallel mandelbrot zoom generator for clusters - server");
+
+  // Viewing window resolution option
+  opt.Add(Option(
+    "port", 'p', ARG_TYPE_INT,
+    "Port to host server on",
+    {"978"}));
+
   return opt;
 }
 
