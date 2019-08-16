@@ -1,11 +1,17 @@
 #ifndef MPIBROT_TXRX_INCLUDED
 #define MPIBROT_TXRX_INCLUDED
 
+// External
+#include "boost/asio.hpp"
+
+// Standard
+#include <vector>
+
 
 // Transmit arbitrary object
 template<class T>
 void Transmit(T const& data, boost::asio::ip::tcp::socket& socket) {
-  write(socket, buffer(&sig, sizeof(T)));
+  write(socket, buffer(&data, sizeof(T)));
 }
 
 
@@ -21,8 +27,7 @@ T Recieve(boost::asio::ip::tcp::socket& socket) {
 // Transmit arbitrary object vector
 template<class T>
 void Transmit(std::vector<T> const& data, boost::asio::ip::tcp::socket& socket) {
-  unsigned elementCount = data.size();
-  write(socket, buffer(&elementCount, sizeof(unsigned)));
+  Transmit<unsigned>(data.size(), socket);
   write(socket, buffer(data.data(), sizeof(T) * data.size()));
 }
 
@@ -32,8 +37,7 @@ template<class T>
 void Recieve(std::vector<T>* data, boost::asio::ip::tcp::socket& socket) {
 
   // Get number of elements to recieve first
-  unsigned elementCount;
-  read(socket, buffer(&elementCount, sizeof(unsigned)));
+  unsigned elementCount = Recieve<unsigned>(socket);
 
   // If neccessary, resize the vector
   if(data->size() != elementCount) {
