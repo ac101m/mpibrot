@@ -6,7 +6,7 @@
 
 
 // Client options
-OptionParser GenClientOptionParser(int argc, char** argv) {
+OptionParser genClientOptionParser(int argc, char** argv) {
   OptionParser opt(
     argc, argv,
     "Parallel mandelbrot zoom generator for clusters - client");
@@ -22,7 +22,7 @@ OptionParser GenClientOptionParser(int argc, char** argv) {
 
 
 // Server options
-OptionParser GenServerOptionParser(int argc, char** argv) {
+OptionParser genServerOptionParser(int argc, char** argv) {
   OptionParser opt(
     argc, argv,
     "Parallel mandelbrot zoom generator for clusters - server");
