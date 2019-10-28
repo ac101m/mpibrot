@@ -28,12 +28,12 @@ SERVER_LD_FLAGS := $(COMMON_LD_FLAGS)
 FIND_NON_MAIN_SRCS := find $(SRC_DIRS) -mindepth 3 -name *.cpp
 
 # Client sources and objects (nothing from compute directory)
-CLIENT_SRCS := $(shell $(FIND_NON_MAIN_SRCS) | grep -v /compute/) src/client.cpp
+CLIENT_SRCS := $(shell $(FIND_NON_MAIN_SRCS) | grep -v /compute/) src/client_main.cpp
 CLIENT_DEBUG_OBJS := $(CLIENT_SRCS:%=$(OBJ_DIR)/client-debug/%.o)
 CLIENT_RELEASE_OBJS := $(CLIENT_SRCS:%=$(OBJ_DIR)/client-release/%.o)
 
 # Server sources and objects (nothing from draw directory)
-SERVER_SRCS := $(shell $(FIND_NON_MAIN_SRCS) | grep -v /draw/) src/server.cpp
+SERVER_SRCS := $(shell $(FIND_NON_MAIN_SRCS) | grep -v /draw/) src/server_main.cpp
 SERVER_DEBUG_OBJS := $(SERVER_SRCS:%=$(OBJ_DIR)/server-debug/%.o)
 SERVER_RELEASE_OBJS := $(SERVER_SRCS:%=$(OBJ_DIR)/server-release/%.o)
 
