@@ -1,9 +1,9 @@
 # Release targets
 OUTPUT_DIR := bin
-CLIENT_RELEASE_TARGET ?= $(OUTPUT_DIR)/mpigrav-client
-CLIENT_DEBUG_TARGET ?= $(OUTPUT_DIR)/mpigrav-client-debug
-SERVER_RELEASE_TARGET ?= $(OUTPUT_DIR)/mpigrav-server
-SERVER_DEBUG_TARGET ?= $(OUTPUT_DIR)/mpigrav-server-debug
+CLIENT_RELEASE_TARGET ?= $(OUTPUT_DIR)/mpibtot-client
+CLIENT_DEBUG_TARGET ?= $(OUTPUT_DIR)/mpibrot-client-debug
+SERVER_RELEASE_TARGET ?= $(OUTPUT_DIR)/mpibrot-server
+SERVER_DEBUG_TARGET ?= $(OUTPUT_DIR)/mpibrot-server-debug
 
 # Directory controls
 OBJ_DIR ?= build
