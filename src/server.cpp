@@ -1,8 +1,10 @@
+// Standard
+#include <iostream>
+
 // External
 #include "mpi.h"
 
 // Internal
-#include <iostream>
 
 
 int main(void) {
