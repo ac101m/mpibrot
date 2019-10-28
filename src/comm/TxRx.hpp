@@ -1,11 +1,11 @@
 #ifndef MPIBROT_TXRX_INCLUDED
 #define MPIBROT_TXRX_INCLUDED
 
-// External
-#include "boost/asio.hpp"
-
 // Standard
 #include <vector>
+
+// External
+#include "boost/asio.hpp"
 
 
 // Transmit arbitrary object
