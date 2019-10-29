@@ -85,7 +85,7 @@ server_release: $(SERVER_RELEASE_OBJS) copy_resources
 	@$(MKDIR_P) $(dir $(SERVER_RELEASE_TARGET))
 	$(MPICXX) $(SERVER_RELEASE_OBJS) -o $(SERVER_RELEASE_TARGET) $(SERVER_LD_FLAGS)
 
-# Collect all resource files in the bin directors
+# Collect all resource files in the bin directories
 copy_resources:
 	@$(MKDIR_P) $(OUTPUT_DIR)
 	cp -r $(RESOURCE_DIR) $(OUTPUT_DIR)
