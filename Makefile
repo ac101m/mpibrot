@@ -46,6 +46,7 @@ SERVER_RELEASE_OBJS := $(SERVER_SRCS:%=$(OBJ_DIR)/server-release/%.o)
 # Header dependencies (all of them)
 SERVER_DEPS := $(SERVER_DEBUG_OBJS:.o=.d) $(SERVER_RELEASE_OBJS:.o=.d)
 CLIENT_DEPS := $(CLIENT_DEBUG_OBJS:.o=.d) $(CLIENT_RELEASE_OBJS:.o=.d)
+TEST_DEPS := $(TEST_OBJS:.o=.d)
 
 #====[TEST OBJECT COMPILATION]================================================#
 # Debug - use mpicxx so that mpi header inclusions don't cause compile errors
@@ -118,7 +119,7 @@ clean:
 	@$(RM) -rv $(OBJ_DIR)
 
 # Include dependencies
--include $(SERVER_DEPS) $(CLIENT_DEPS)
+-include $(SERVER_DEPS) $(CLIENT_DEPS) $(TEST_DEPS)
 
 # Make directory
 MKDIR_P ?= mkdir -p
