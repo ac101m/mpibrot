@@ -34,12 +34,12 @@ TEST_SRCS := $(shell $(FIND_NON_MAIN_SRCS) | grep -v /draw/) src/test_main.cpp
 TEST_OBJS := $(TEST_SRCS:%=$(OBJ_DIR)/test/%.o)
 
 # Client sources and objects (nothing from compute directory)
-CLIENT_SRCS := $(shell $(FIND_NON_MAIN_SRCS) | grep -v /compute/) src/client_main.cpp
+CLIENT_SRCS := $(shell $(FIND_NON_MAIN_SRCS) | grep -v /compute/ -v /test/) src/client_main.cpp
 CLIENT_DEBUG_OBJS := $(CLIENT_SRCS:%=$(OBJ_DIR)/client-debug/%.o)
 CLIENT_RELEASE_OBJS := $(CLIENT_SRCS:%=$(OBJ_DIR)/client-release/%.o)
 
 # Server sources and objects (nothing from draw directory)
-SERVER_SRCS := $(shell $(FIND_NON_MAIN_SRCS) | grep -v /draw/) src/server_main.cpp
+SERVER_SRCS := $(shell $(FIND_NON_MAIN_SRCS) | grep -v /draw/ -v /test/) src/server_main.cpp
 SERVER_DEBUG_OBJS := $(SERVER_SRCS:%=$(OBJ_DIR)/server-debug/%.o)
 SERVER_RELEASE_OBJS := $(SERVER_SRCS:%=$(OBJ_DIR)/server-release/%.o)
 
