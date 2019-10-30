@@ -21,6 +21,19 @@ void giveSemaphore(
 }
 
 
+// Take a semaphore a bunch of times
+// Will block if count is not high enough
+void takeSemaphore(
+  util::CountingSemaphore * const t_semaphore,
+  unsigned const t_take_count)
+{
+  for(unsigned i = 0; i < t_take_count; i++)
+  {
+    t_semaphore->take();
+  }
+}
+
+
 // Take a semaphore a bunch of times, return as soon as it fails
 void tryTakeSemaphore(
   util::CountingSemaphore * const t_semaphore,
@@ -33,57 +46,152 @@ void tryTakeSemaphore(
 }
 
 
-TEST_CASE("Initialisation take test", "[counting semaphore]")
+SCENARIO(
+  "Single thread counting semaphore test",
+  "[CountingSemaphore]")
 {
-  unsigned initial_count = 64;
-  unsigned take_count = 0;
+  GIVEN("A counting semaphore with an initial count of zero")
+  {
+    util::CountingSemaphore semaphore;
 
-  util::CountingSemaphore semaphore(initial_count);
+    WHEN("The count is retrieved having performed no other operations")
+    {
+      THEN("The retrieved count is zero")
+      {
+        REQUIRE(semaphore.count() == 0);
+      }
+    }
 
-  tryTakeSemaphore(&semaphore, &take_count);
+    WHEN("An attempt is made to take the semaphore having performed no other operations")
+    {
+      THEN("The operation fails")
+      {
+        REQUIRE(semaphore.try_take() == false);
+      }
+    }
 
-  REQUIRE(take_count == initial_count);
+    WHEN("The semaphore is given n times")
+    {
+      unsigned n = 16;
+
+      for(unsigned i = 0; i < n; i++)
+      {
+        semaphore.give();
+      }
+
+      THEN("The semaphore count is n")
+      {
+        REQUIRE(semaphore.count() == n);
+      }
+    }
+  }
+
+  GIVEN("A counting semaphore with an initial count of n")
+  {
+    unsigned n = 16;
+
+    util::CountingSemaphore semaphore(n);
+
+    WHEN("The count is retrieved having performed no other operations")
+    {
+      THEN("The retrieved count is n")
+      {
+        REQUIRE(semaphore.count() == n);
+      }
+    }
+
+    WHEN("The semaphore is taken repeatedly")
+    {
+      unsigned take_success_count = 0;
+
+      tryTakeSemaphore(&semaphore, &take_success_count);
+
+      THEN("The semaphore can be taken n times")
+      {
+        REQUIRE(take_success_count == n);
+      }
+    }
+  }
 }
 
 
-TEST_CASE("Serial take test", "[counting semaphore]")
+SCENARIO(
+  "Multi-thread counting semaphore test",
+  "[CountingSemaphore]")
 {
-  util::CountingSemaphore semaphore;
-
-  unsigned give_count = 64;
-  unsigned take_count = 0;
-
-  giveSemaphore(&semaphore, give_count);
-  tryTakeSemaphore(&semaphore, &take_count);
-
-  REQUIRE(take_count == give_count);
-}
-
-
-TEST_CASE("Parallel take test", "[counting semaphore]")
-{
-  util::CountingSemaphore semaphore;
-
-  unsigned give_count = 8192;
-  unsigned take_count = 0;
-  unsigned num_threads = 4;
-
-  giveSemaphore(&semaphore, give_count);
-
-  std::vector<unsigned> take_counts(num_threads, 0);
-  std::vector<std::unique_ptr<std::thread>> take_threads(num_threads);
-
-  for(unsigned i = 0; i < num_threads; i++)
+  GIVEN("A counting semaphore with an initial count of zero")
   {
-    take_threads[i] = std::unique_ptr<std::thread>(
-      new std::thread(tryTakeSemaphore, &semaphore, &take_counts[i]));
+    util::CountingSemaphore semaphore;
+
+    WHEN("Multiple threads give the semaphore simultaneously")
+    {
+      unsigned thread_count = 4;
+      unsigned gives_per_thread = 65536;
+
+      std::vector<std::unique_ptr<std::thread>> give_threads(thread_count);
+
+      for(unsigned i = 0; i < give_threads.size(); i++)
+      {
+        give_threads[i] = std::unique_ptr<std::thread>(
+          new std::thread(giveSemaphore, &semaphore, gives_per_thread));
+      }
+
+      for(unsigned i = 0; i < give_threads.size(); i++)
+      {
+        give_threads[i]->join();
+      }
+
+      THEN("The semaphore count is correctly preserved")
+      {
+        REQUIRE(semaphore.count() == (thread_count * gives_per_thread));
+      }
+    }
+
+    WHEN("Give and take are called concurrently from two threads")
+    {
+      unsigned take_count = 32768;
+      unsigned give_count = 65536;
+
+      std::thread take_thread(takeSemaphore, &semaphore, take_count);
+      std::thread give_thread(giveSemaphore, &semaphore, give_count);
+
+      give_thread.join();
+      take_thread.join();
+
+      THEN("The semaphore count is correctly preserved")
+      {
+        REQUIRE(semaphore.count() == (give_count - take_count));
+      }
+    }
   }
 
-  for(unsigned i = 0; i < num_threads; i++)
+  GIVEN("A counting semaphore with a non-zero initial count")
   {
-    take_threads[i]->join();
-    take_count += take_counts[i];
-  }
+    unsigned thread_count = 4;
+    unsigned takes_per_thread = 65536;
+    unsigned initial_count = thread_count * takes_per_thread * 2;
 
-  REQUIRE(take_count == give_count);
+    util::CountingSemaphore semaphore(initial_count);
+
+    WHEN("Multiple threads take the semaphore simultaneously")
+    {
+      std::vector<std::unique_ptr<std::thread>> take_threads(thread_count);
+
+      for(unsigned i = 0; i < take_threads.size(); i++)
+      {
+        take_threads[i] = std::unique_ptr<std::thread>(
+          new std::thread(takeSemaphore, &semaphore, takes_per_thread));
+      }
+
+      for(unsigned i = 0; i < take_threads.size(); i++)
+      {
+        take_threads[i]->join();
+      }
+
+      THEN("The semaphore count is correctly preserved")
+      {
+        REQUIRE(semaphore.count() == initial_count - (thread_count * takes_per_thread));
+      }
+    }
+  }
 }
