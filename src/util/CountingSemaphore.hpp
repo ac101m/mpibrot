@@ -40,7 +40,7 @@ namespace util
       m_count--;
     }
 
-    inline bool try_take()
+    inline bool tryTake()
     {
       std::lock_guard<decltype(m_mutex)> lock(m_mutex);
       if(m_count)

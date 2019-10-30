@@ -40,7 +40,7 @@ void tryTakeSemaphore(
   unsigned * const t_take_count)
 {
   *t_take_count = 0;
-  while(t_semaphore->try_take()) {
+  while(t_semaphore->tryTake()) {
     (*t_take_count)++;
   }
 }
@@ -66,7 +66,7 @@ SCENARIO(
     {
       THEN("The operation fails")
       {
-        REQUIRE(semaphore.try_take() == false);
+        REQUIRE(semaphore.tryTake() == false);
       }
     }
 
