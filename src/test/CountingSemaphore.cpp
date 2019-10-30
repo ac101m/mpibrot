@@ -47,8 +47,7 @@ void tryTakeSemaphore(
 
 
 SCENARIO(
-  "Single thread counting semaphore test",
-  "[CountingSemaphore]")
+  "[Counting semaphore] - Single-threaded test")
 {
   GIVEN("A counting semaphore with an initial count of zero")
   {
@@ -116,8 +115,7 @@ SCENARIO(
 
 
 SCENARIO(
-  "Multi-thread counting semaphore test",
-  "[CountingSemaphore]")
+  "[Counting semaphore] - Multi-threaded test")
 {
   GIVEN("A counting semaphore with an initial count of zero")
   {
