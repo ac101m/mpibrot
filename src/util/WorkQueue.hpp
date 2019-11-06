@@ -78,8 +78,9 @@ namespace util
     template<class T>
     inline std::shared_ptr<T> dequeue()
     {
-      return std::static_pointer_cast<T>(m_output_queue->dequeue());
+      std::shared_ptr<T> work_item = std::static_pointer_cast<T>(m_output_queue->dequeue());
       m_guard_semaphore->give();
+      return work_item;
     }
 
     template<class T>

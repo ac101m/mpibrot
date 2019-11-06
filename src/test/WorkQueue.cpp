@@ -84,7 +84,7 @@ SCENARIO(
 
     WHEN("They are processed by a work queue")
     {
-      unsigned thread_count = 8;
+      unsigned thread_count = 24;
 
       util::WorkQueue compute_engine(thread_count);
 
