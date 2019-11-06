@@ -19,7 +19,7 @@ INC_FLAGS ?= -Iinclude -Isrc
 COMMON_FLAGS ?= -MMD -MP -m64 -std=c++14 -Wall
 DEBUG_FLAGS ?= $(COMMON_FLAGS) -g
 RELEASE_FLAGS ?= $(COMMON_FLAGS) -O3
-COMMON_LD_FLAGS := -loptparse -l:libboost_system.a
+COMMON_LD_FLAGS := -loptparse -l:libboost_system.a -static-libstdc++
 TEST_LD_FLAGS := $(COMMON_LD_FLAGS)
 CLIENT_LD_FLAGS := $(COMMON_LD_FLAGS) -lgltools -lGLEW -lglfw -lGL
 SERVER_LD_FLAGS := $(COMMON_LD_FLAGS)
