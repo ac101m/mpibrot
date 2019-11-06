@@ -49,7 +49,7 @@ namespace util
 
   public:
     WorkQueue(
-      unsigned const t_thread_count = 2,
+      unsigned const t_thread_count = 1,
       unsigned const t_input_queue_length = 4,
       unsigned const t_output_queue_length = 4) :
       m_input_queue(new util::SyncQueue<std::shared_ptr<WorkItem>>(t_input_queue_length)),
