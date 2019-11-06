@@ -34,16 +34,14 @@ namespace util
     std::vector<std::thread> m_worker_threads;
 
 
-    void workerMain(
-      std::shared_ptr<util::SyncQueue<std::shared_ptr<WorkItem>>> t_input_queue,
-      std::shared_ptr<util::SyncQueue<std::shared_ptr<WorkItem>>> t_output_queue)
+    void workerMain()
     {
       std::shared_ptr<WorkItem> work_item;
 
-      while((work_item = t_input_queue->dequeue()) != nullptr)
+      while((work_item = m_input_queue->dequeue()) != nullptr)
       {
         work_item->execute();
-        t_output_queue->enqueue(work_item);
+        m_output_queue->enqueue(work_item);
       }
     }
 
@@ -59,12 +57,7 @@ namespace util
     {
       for(unsigned i = 0; i < t_thread_count; i++)
       {
-        m_worker_threads.push_back(
-          std::thread(
-            &util::WorkQueue::workerMain,
-            this,
-            m_input_queue,
-            m_output_queue));
+        m_worker_threads.push_back(std::thread(&util::WorkQueue::workerMain, this));
       }
     }
 
