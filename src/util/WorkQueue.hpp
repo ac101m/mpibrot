@@ -47,9 +47,9 @@ namespace util
 
   public:
     WorkQueue(
-      unsigned const t_thread_count = 1,
-      unsigned const t_input_queue_length = 4,
-      unsigned const t_output_queue_length = 4) :
+      unsigned const t_thread_count,
+      unsigned const t_input_queue_length,
+      unsigned const t_output_queue_length) :
       m_input_queue(new util::SyncQueue<std::shared_ptr<WorkItem>>(t_input_queue_length)),
       m_output_queue(new util::SyncQueue<std::shared_ptr<WorkItem>>(t_output_queue_length)),
       m_max_work_items(t_input_queue_length + t_thread_count),

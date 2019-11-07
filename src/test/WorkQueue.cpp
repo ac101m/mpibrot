@@ -85,11 +85,13 @@ SCENARIO(
     WHEN("They are processed by a work queue")
     {
       unsigned thread_count = 24;
+      unsigned input_buffer_size = 4;
+      unsigned output_buffer_size = 4;
 
-      util::WorkQueue compute_engine(thread_count);
+      util::WorkQueue work_queue(thread_count, input_buffer_size, output_buffer_size);
 
-      std::thread enqueue_thread(&util::WorkQueue::enqueueVector<AckermannWorkItem>, &compute_engine, std::ref(input_work_items));
-      std::thread dequeue_thread(&util::WorkQueue::dequeueVector<AckermannWorkItem>, &compute_engine, std::ref(output_work_items));
+      std::thread enqueue_thread(&util::WorkQueue::enqueueVector<AckermannWorkItem>, &work_queue, std::ref(input_work_items));
+      std::thread dequeue_thread(&util::WorkQueue::dequeueVector<AckermannWorkItem>, &work_queue, std::ref(output_work_items));
 
       enqueue_thread.join();
       dequeue_thread.join();
