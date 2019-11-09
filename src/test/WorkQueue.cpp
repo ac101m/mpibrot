@@ -88,10 +88,10 @@ SCENARIO(
       unsigned input_buffer_size = 4;
       unsigned output_buffer_size = 4;
 
-      util::WorkQueue work_queue(thread_count, input_buffer_size, output_buffer_size);
+      util::WorkQueue<AckermannWorkItem> work_queue(thread_count, input_buffer_size, output_buffer_size);
 
-      std::thread enqueue_thread(&util::WorkQueue::enqueueVector<AckermannWorkItem>, &work_queue, std::ref(input_work_items));
-      std::thread dequeue_thread(&util::WorkQueue::dequeueVector<AckermannWorkItem>, &work_queue, std::ref(output_work_items));
+      std::thread enqueue_thread(&util::WorkQueue<AckermannWorkItem>::enqueueVector, &work_queue, std::ref(input_work_items));
+      std::thread dequeue_thread(&util::WorkQueue<AckermannWorkItem>::dequeueVector, &work_queue, std::ref(output_work_items));
 
       enqueue_thread.join();
       dequeue_thread.join();
