@@ -54,10 +54,10 @@ CLIENT_DEPS := $(CLIENT_DEBUG_OBJS:.o=.d) $(CLIENT_RELEASE_OBJS:.o=.d)
 TEST_DEPS := $(TEST_OBJS:.o=.d)
 
 #====[TEST OBJECT COMPILATION]================================================#
-# Single node tests
+# Single node tests, use mpicxx to avoid errors caused by mpi header inclusion
 $(OBJ_DIR)/test/%.cpp.o: %.cpp
 	@$(MKDIR_P) $(dir $@)
-	$(CXX) $(DEBUG_FLAGS) $(INC_FLAGS) -c $< -o $@
+	$(MPICXX) $(DEBUG_FLAGS) $(INC_FLAGS) -c $< -o $@
 
 # Multi node tests
 $(OBJ_DIR)/test_multinode/%.cpp.o: %.cpp
@@ -87,10 +87,10 @@ $(OBJ_DIR)/server-release/%.cpp.o: %.cpp
 	$(MPICXX) $(RELEASE_FLAGS) $(INC_FLAGS) -c $< -o $@
 
 #====[BUILD TARGETS]==========================================================#
-# Single node test target
+# Single node test target, use mpicxx to avoid mpi related linker errors
 test: $(TEST_OBJS) copy_resources
 	@$(MKDIR_P) $(dir $(TEST_TARGET))
-	$(CXX) $(TEST_OBJS) -o $(TEST_TARGET) $(TEST_LD_FLAGS)
+	$(MPICXX) $(TEST_OBJS) -o $(TEST_TARGET) $(TEST_LD_FLAGS)
 
 # Multi node test target
 test_multinode: $(TEST_OBJS_MULTINODE) copy_resources
