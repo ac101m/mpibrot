@@ -101,6 +101,11 @@ namespace util
       return m_input_queue->size();
     }
 
+    unsigned getMaxWorkItems() const
+    {
+      return m_max_work_items;
+    }
+
     ~WorkQueue()
     {
       // Wait for all work to be dequeued
