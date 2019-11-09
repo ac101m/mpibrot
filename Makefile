@@ -1,10 +1,11 @@
 # Release targets
 OUTPUT_DIR := bin
-CLIENT_RELEASE_TARGET ?= $(OUTPUT_DIR)/mpibrot-client
-CLIENT_DEBUG_TARGET ?= $(OUTPUT_DIR)/mpibrot-client-debug
-SERVER_RELEASE_TARGET ?= $(OUTPUT_DIR)/mpibrot-server
-SERVER_DEBUG_TARGET ?= $(OUTPUT_DIR)/mpibrot-server-debug
-TEST_TARGET ?= $(OUTPUT_DIR)/mpibrot-test
+CLIENT_RELEASE_TARGET ?= $(OUTPUT_DIR)/client
+CLIENT_DEBUG_TARGET ?= $(OUTPUT_DIR)/client-debug
+SERVER_RELEASE_TARGET ?= $(OUTPUT_DIR)/server
+SERVER_DEBUG_TARGET ?= $(OUTPUT_DIR)/server-debug
+TEST_TARGET ?= $(OUTPUT_DIR)/test
+TEST_TARGET_MULTINODE ?= $(OUTPUT_DIR)/test-multinode
 
 # Directory controls
 OBJ_DIR ?= build
@@ -19,7 +20,7 @@ INC_FLAGS ?= -Iinclude -Isrc
 COMMON_FLAGS ?= -MMD -MP -m64 -std=c++14 -Wall
 DEBUG_FLAGS ?= $(COMMON_FLAGS) -g
 RELEASE_FLAGS ?= $(COMMON_FLAGS) -O3
-COMMON_LD_FLAGS := -loptparse -l:libboost_system.a -static-libstdc++
+COMMON_LD_FLAGS := -loptparse -l:libboost_system.a -static-libstdc++ -pthread
 TEST_LD_FLAGS := $(COMMON_LD_FLAGS)
 CLIENT_LD_FLAGS := $(COMMON_LD_FLAGS) -lgltools -lGLEW -lglfw -lGL
 SERVER_LD_FLAGS := $(COMMON_LD_FLAGS)
@@ -29,9 +30,13 @@ SERVER_LD_FLAGS := $(COMMON_LD_FLAGS)
 # Command to locate non main sources
 FIND_NON_MAIN_SRCS := find $(SRC_DIRS) -mindepth 3 -name *.cpp
 
-# Test compiles all sources
-TEST_SRCS := $(shell $(FIND_NON_MAIN_SRCS) | grep -v /draw/) src/test_main.cpp
+# Basic test sources
+TEST_SRCS := $(shell $(FIND_NON_MAIN_SRCS) | grep -v /draw/ | grep -v /test_multinode/) src/test_main.cpp
 TEST_OBJS := $(TEST_SRCS:%=$(OBJ_DIR)/test/%.o)
+
+# Multinode test sources
+TEST_SRCS_MULTINODE := $(shell $(FIND_NON_MAIN_SRCS) | grep -v /draw/ | grep -v /test/) src/test_multinode_main.cpp
+TEST_OBJS_MULTINODE := $(TEST_SRCS_MULTINODE:%=$(OBJ_DIR)/test_multinode/%.o)
 
 # Client sources and objects (nothing from compute directory)
 CLIENT_SRCS := $(shell $(FIND_NON_MAIN_SRCS) | grep -v /compute/ | grep -v /test/) src/client_main.cpp
@@ -49,9 +54,13 @@ CLIENT_DEPS := $(CLIENT_DEBUG_OBJS:.o=.d) $(CLIENT_RELEASE_OBJS:.o=.d)
 TEST_DEPS := $(TEST_OBJS:.o=.d)
 
 #====[TEST OBJECT COMPILATION]================================================#
-# Debug - use mpicxx so that mpi header inclusions don't cause compile errors
-# Consequences are a problem for the me of tomorrow...
+# Single node tests
 $(OBJ_DIR)/test/%.cpp.o: %.cpp
+	@$(MKDIR_P) $(dir $@)
+	$(CXX) $(DEBUG_FLAGS) $(INC_FLAGS) -c $< -o $@
+
+# Multi node tests
+$(OBJ_DIR)/test_multinode/%.cpp.o: %.cpp
 	@$(MKDIR_P) $(dir $@)
 	$(MPICXX) $(DEBUG_FLAGS) $(INC_FLAGS) -c $< -o $@
 
@@ -78,10 +87,15 @@ $(OBJ_DIR)/server-release/%.cpp.o: %.cpp
 	$(MPICXX) $(RELEASE_FLAGS) $(INC_FLAGS) -c $< -o $@
 
 #====[BUILD TARGETS]==========================================================#
-# Test target
+# Single node test target
 test: $(TEST_OBJS) copy_resources
 	@$(MKDIR_P) $(dir $(TEST_TARGET))
-	$(MPICXX) $(TEST_OBJS) -o $(TEST_TARGET) $(TEST_LD_FLAGS)
+	$(CXX) $(TEST_OBJS) -o $(TEST_TARGET) $(TEST_LD_FLAGS)
+
+# Multi node test target
+test_multinode: $(TEST_OBJS_MULTINODE) copy_resources
+	@$(MKDIR_P) $(dir $(TEST_TARGET_MULTINODE))
+	$(MPICXX) $(TEST_OBJS_MULTINODE) -o $(TEST_TARGET_MULTINODE) $(TEST_LD_FLAGS)
 
 # Client debug target
 client_debug: $(CLIENT_DEBUG_OBJS) copy_resources
