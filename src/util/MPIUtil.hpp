@@ -19,20 +19,9 @@ namespace util
   namespace mpi
   {
 
-    int myRank(MPI_Comm const t_communicator = MPI_COMM_WORLD)
-    {
-      int my_rank;
-      MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
-      return my_rank;
-    }
+    int myRank(MPI_Comm const t_communicator = MPI_COMM_WORLD);
 
-
-    int rankCount(MPI_Comm const t_communicator = MPI_COMM_WORLD)
-    {
-      int rank_count;
-      MPI_Comm_size(MPI_COMM_WORLD, &rank_count);
-      return rank_count;
-    }
+    int rankCount(MPI_Comm const t_communicator = MPI_COMM_WORLD);
 
 
     class Tag : private RefCount
