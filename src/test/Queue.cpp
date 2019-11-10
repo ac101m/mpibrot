@@ -10,7 +10,7 @@
 #include <time.h>
 
 // Internal
-#include "util/SyncQueue.hpp"
+#include "util/Queue.hpp"
 
 
 std::vector<int> genTestVector(
@@ -39,7 +39,7 @@ SCENARIO(
     {
       unsigned queue_length = 32;
 
-      util::SyncQueue<float> queue(queue_length);
+      util::Queue<float> queue(queue_length);
 
       queue.enqueue(enqueue_value);
 
@@ -60,7 +60,7 @@ SCENARIO(
     std::vector<int> input_vector = genTestVector(test_vector_length);
     std::vector<int> output_vector(test_vector_length);
 
-    util::SyncQueue<int> queue(queue_length);
+    util::Queue<int> queue(queue_length);
 
     WHEN("The vector is enqueued, then dequeued")
     {
@@ -91,10 +91,10 @@ SCENARIO(
     {
       unsigned queue_length = 32;
 
-      util::SyncQueue<int> queue(queue_length);
+      util::Queue<int> queue(queue_length);
 
-      std::thread enqueue_thread(&util::SyncQueue<int>::enqueueVector, &queue, std::ref(input_vector));
-      std::thread dequeue_thread(&util::SyncQueue<int>::dequeueVector, &queue, std::ref(output_vector));
+      std::thread enqueue_thread(&util::Queue<int>::enqueueVector, &queue, std::ref(input_vector));
+      std::thread dequeue_thread(&util::Queue<int>::dequeueVector, &queue, std::ref(output_vector));
 
       enqueue_thread.join();
       dequeue_thread.join();
@@ -132,15 +132,15 @@ SCENARIO(
         dequeue_vectors[i % thread_count].push_back(0);
       }
 
-      util::SyncQueue<int> queue(queue_length);
+      util::Queue<int> queue(queue_length);
 
       std::vector<std::thread> enqueue_threads(thread_count);
       std::vector<std::thread> dequeue_threads(thread_count);
 
       for(unsigned i = 0; i < thread_count; i++)
       {
-        enqueue_threads[i] = std::thread(&util::SyncQueue<int>::enqueueVector, &queue, std::ref(enqueue_vectors[i]));
-        dequeue_threads[i] = std::thread(&util::SyncQueue<int>::dequeueVector, &queue, std::ref(dequeue_vectors[i]));
+        enqueue_threads[i] = std::thread(&util::Queue<int>::enqueueVector, &queue, std::ref(enqueue_vectors[i]));
+        dequeue_threads[i] = std::thread(&util::Queue<int>::dequeueVector, &queue, std::ref(dequeue_vectors[i]));
       }
 
       for(unsigned i = 0; i < enqueue_threads.size(); i++)

@@ -14,7 +14,7 @@ namespace util
 {
 
   template<class T>
-  class SyncQueue
+  class Queue
   {
   private:
     unsigned m_front = 0;
@@ -25,7 +25,7 @@ namespace util
     std::mutex m_mutex;
 
   public:
-    SyncQueue(unsigned const t_size) :
+    Queue(unsigned const t_size) :
       m_front(0),
       m_back(0),
       m_buffer(std::vector<T>(t_size)),
