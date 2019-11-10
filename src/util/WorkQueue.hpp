@@ -9,7 +9,7 @@
 // External
 
 // Internal
-#include "util/SyncQueue.hpp"
+#include "util/Queue.hpp"
 
 
 namespace util
@@ -26,8 +26,8 @@ namespace util
   class WorkQueue
   {
   private:
-    std::unique_ptr<util::SyncQueue<std::shared_ptr<T>>> m_input_queue;
-    std::unique_ptr<util::SyncQueue<std::shared_ptr<T>>> m_output_queue;
+    std::unique_ptr<util::Queue<std::shared_ptr<T>>> m_input_queue;
+    std::unique_ptr<util::Queue<std::shared_ptr<T>>> m_output_queue;
 
     unsigned const m_max_work_items;
     std::unique_ptr<util::CountingSemaphore> m_guard_semaphore;
@@ -51,8 +51,8 @@ namespace util
       unsigned const t_thread_count,
       unsigned const t_input_queue_length,
       unsigned const t_output_queue_length) :
-      m_input_queue(new util::SyncQueue<std::shared_ptr<T>>(t_input_queue_length)),
-      m_output_queue(new util::SyncQueue<std::shared_ptr<T>>(t_output_queue_length)),
+      m_input_queue(new util::Queue<std::shared_ptr<T>>(t_input_queue_length)),
+      m_output_queue(new util::Queue<std::shared_ptr<T>>(t_output_queue_length)),
       m_max_work_items(t_input_queue_length + t_thread_count),
       m_guard_semaphore(new util::CountingSemaphore(m_max_work_items))
     {
