@@ -96,22 +96,6 @@ namespace util
       return data;
     }
 
-    void enqueueVector(std::vector<T> const & t_data)
-    {
-      for(unsigned i = 0; i < t_data.size(); i++)
-      {
-        this->enqueue(t_data[i]);
-      }
-    }
-
-    void dequeueVector(std::vector<T> & t_data)
-    {
-      for(unsigned i = 0; i < t_data.size(); i++)
-      {
-        t_data[i] = this->dequeue();
-      }
-    }
-
     unsigned size() const
     {
       return m_buffer.size();
