@@ -46,7 +46,7 @@ private:
 
   virtual void processWorkItem(AckermannInput t_input)
   {
-    this->m_ackermann_result_queue->Enqueue(ack(t_input.m, t_input.n));
+    this->m_ackermann_result_queue->enqueue(ack(t_input.m, t_input.n));
   }
 
 public:

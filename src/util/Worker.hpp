@@ -62,17 +62,17 @@ namespace util
       }
     }
 
-    void Enqueue(T_in t_data)
+    void enqueue(T_in t_data)
     {
       m_guard_semaphore->take();
-      m_input_queue->Enqueue(t_data);
+      m_input_queue->enqueue(t_data);
     }
 
     void enqueueVector(std::vector<T_in> const & t_data)
     {
       for(unsigned i = 0; i < t_data.size(); i++)
       {
-        this->Enqueue(t_data[i]);
+        this->enqueue(t_data[i]);
       }
     }
 
@@ -90,7 +90,7 @@ namespace util
 
       for(unsigned i = 0; i < m_worker_threads.size(); i++)
       {
-        m_input_queue->Enqueue(this->workerExitSignal());
+        m_input_queue->enqueue(this->workerExitSignal());
       }
 
       for(unsigned i = 0; i < m_worker_threads.size(); i++)

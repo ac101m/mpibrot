@@ -86,7 +86,7 @@ namespace util
     {
       for(unsigned i = 0; i < t_data.size(); i++)
       {
-        this->Enqueue(t_data[i]);
+        this->enqueue(t_data[i]);
       }
     }
 
