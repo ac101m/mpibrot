@@ -13,25 +13,28 @@
 namespace util
 {
 
-  // Virtual class serves as an interface for anything that
-  // uses queues for asynchronous communication
+  // Base class for things that you can Enqueue stuff to
   template<class T>
-  class QueueLikeObject
+  class Enqueue
   {
   public:
     virtual void enqueue(T t_data) = 0;
     virtual void enqueueVector(std::vector<T> const & t_data) = 0;
-
-    virtual T dequeue() = 0;
-    virtual void dequeueVector(std::vector<T> & t_data) = 0;
-
-    virtual unsigned size() const = 0;
   };
 
 
+  // Base class for things that you can dequeue stuff from
+  template<class T>
+  class Dequeue
+  {
+  public:
+    virtual T dequeue() = 0;
+    virtual void dequeueVector(std::vector<T> & t_data) = 0;
+  };
+
 
   template<class T>
-  class Queue : public QueueLikeObject<T>
+  class Queue : public Enqueue<T>, public Dequeue<T>
   {
   private:
     unsigned m_front = 0;
@@ -83,7 +86,7 @@ namespace util
     {
       for(unsigned i = 0; i < t_data.size(); i++)
       {
-        this->enqueue(t_data[i]);
+        this->Enqueue(t_data[i]);
       }
     }
 
