@@ -19,7 +19,14 @@ namespace util
   {
   public:
     virtual void enqueue(T t_data) = 0;
-    virtual void enqueueVector(std::vector<T> const & t_data) = 0;
+
+    void enqueueVector(std::vector<T> const & t_data)
+    {
+      for(unsigned i = 0; i < t_data.size(); i++)
+      {
+        this->enqueue(t_data[i]);
+      }
+    }
   };
 
 
@@ -29,7 +36,14 @@ namespace util
   {
   public:
     virtual T dequeue() = 0;
-    virtual void dequeueVector(std::vector<T> & t_data) = 0;
+    
+    void dequeueVector(std::vector<T> & t_data)
+    {
+      for(unsigned i = 0; i < t_data.size(); i++)
+      {
+        t_data[i] = this->dequeue();
+      }
+    }
   };
 
 
