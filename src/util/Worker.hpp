@@ -68,14 +68,6 @@ namespace util
       m_input_queue->enqueue(t_data);
     }
 
-    void enqueueVector(std::vector<T_in> const & t_data)
-    {
-      for(unsigned i = 0; i < t_data.size(); i++)
-      {
-        this->enqueue(t_data[i]);
-      }
-    }
-
     unsigned threadCount() const
     {
       return m_worker_threads.size();
