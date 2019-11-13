@@ -49,8 +49,8 @@ namespace util
 
   public:
     Worker(
-      unsigned const t_thread_count = 1,
-      unsigned const t_input_queue_size = 4) :
+      unsigned const t_thread_count,
+      unsigned const t_input_queue_size) :
       m_input_queue(new util::Queue<T_in>(t_input_queue_size)),
       m_max_work_items(t_thread_count + t_input_queue_size),
       m_guard_semaphore(new util::CountingSemaphore(m_max_work_items)),
