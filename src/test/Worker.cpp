@@ -36,14 +36,16 @@ unsigned ack(unsigned m, unsigned n)
 }
 
 
+// Test worker, computes ackermanns function
 class AckermannWorker : public util::Worker<AckermannInput>
 {
 private:
 
-  // Ackermann worker output queues
+  // Add member variables for output queues
   std::shared_ptr<util::Enqueue<unsigned>> m_ackermann_result_queue;
 
 
+  // Work to perform on each input
   virtual void processWorkItem(AckermannInput t_input)
   {
     this->m_ackermann_result_queue->enqueue(ack(t_input.m, t_input.n));
