@@ -49,6 +49,8 @@ namespace util
       else
       {
         this->m_shared_count_ptr = other.m_shared_count_ptr;
+        this->Increment();
+        return *this;
       }
     }
 
