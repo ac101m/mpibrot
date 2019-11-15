@@ -16,45 +16,41 @@ namespace util
 {
 
   template<class T_in>
-  class Worker : public Enqueue<T_in>
+  class Worker
   {
-  protected:
+  private:
     std::shared_ptr<util::Queue<T_in>> m_input_queue;
-
-    unsigned const m_max_work_items;
-    std::unique_ptr<util::CountingSemaphore> m_guard_semaphore;
 
     std::vector<std::thread> m_worker_threads;
 
+    T_in const m_shutdown_signal_value;
 
-    // Value of T_in which workers should interpret as a stop signal
-    virtual T_in workerExitSignal()
-    {
-      return T_in();
-    }
 
-    // Process an arbitrary work item
+  // Methods
+  protected:
     virtual void processWorkItem(T_in t_work_item) = 0;
+
 
     void workerMain()
     {
       T_in work_item;
 
-      while((work_item = m_input_queue->dequeue()) != this->workerExitSignal())
+      while((work_item = m_input_queue->dequeue()) != m_shutdown_signal_value)
       {
         processWorkItem(work_item);
-        m_guard_semaphore->give();
       }
     }
 
+
+  // Methods
   public:
     Worker(
+      std::shared_ptr<Queue<T_in>> t_input_queue,
       unsigned const t_thread_count,
-      unsigned const t_input_queue_size) :
-      m_input_queue(new util::Queue<T_in>(t_input_queue_size)),
-      m_max_work_items(t_thread_count + t_input_queue_size),
-      m_guard_semaphore(new util::CountingSemaphore(m_max_work_items)),
-      m_worker_threads(std::vector<std::thread>(t_thread_count))
+      T_in const t_shutdown_signal_value = T_in()) :    // Value of T_in which should initiate worker thread shutdown
+      m_input_queue(t_input_queue),
+      m_worker_threads(std::vector<std::thread>(t_thread_count)),
+      m_shutdown_signal_value(t_shutdown_signal_value)
     {
       for(unsigned i = 0; i < t_thread_count; i++)
       {
@@ -62,27 +58,18 @@ namespace util
       }
     }
 
-    void enqueue(T_in t_data)
-    {
-      m_guard_semaphore->take();
-      m_input_queue->enqueue(t_data);
-    }
 
     unsigned threadCount() const
     {
       return m_worker_threads.size();
     }
 
+
     ~Worker()
     {
       for(unsigned i = 0; i < m_worker_threads.size(); i++)
       {
-        m_guard_semaphore->take();
-      }
-
-      for(unsigned i = 0; i < m_worker_threads.size(); i++)
-      {
-        m_input_queue->enqueue(this->workerExitSignal());
+        m_input_queue->enqueue(m_shutdown_signal_value);
       }
 
       for(unsigned i = 0; i < m_worker_threads.size(); i++)

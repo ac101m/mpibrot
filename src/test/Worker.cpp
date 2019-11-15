@@ -42,7 +42,7 @@ class AckermannWorker : public util::Worker<AckermannInput>
 private:
 
   // Add member variables for output queues
-  std::shared_ptr<util::Enqueue<unsigned>> m_ackermann_result_queue;
+  std::shared_ptr<util::Queue<unsigned>> m_ackermann_result_queue;
 
 
   // Work to perform on each input
@@ -53,10 +53,10 @@ private:
 
 public:
   AckermannWorker(
-    unsigned const t_thread_count,
-    unsigned const t_input_queue_size,
-    std::shared_ptr<util::Enqueue<unsigned>> t_ackermann_result_queue) :
-    Worker(t_thread_count, t_input_queue_size),
+    std::shared_ptr<util::Queue<AckermannInput>> t_input_queue,
+    std::shared_ptr<util::Queue<unsigned>> t_ackermann_result_queue,
+    unsigned const t_thread_count) :
+    Worker(t_input_queue, t_thread_count),
     m_ackermann_result_queue(t_ackermann_result_queue)
   {}
 };
@@ -105,11 +105,12 @@ SCENARIO(
       unsigned input_queue_size = 4;
       unsigned output_queue_size = 4;
 
+      std::shared_ptr<util::Queue<AckermannInput>> input_queue(new util::Queue<AckermannInput>(input_queue_size));
       std::shared_ptr<util::Queue<unsigned>> output_queue(new util::Queue<unsigned>(output_queue_size));
 
-      AckermannWorker worker(thread_count, input_queue_size, output_queue);
+      AckermannWorker worker(input_queue, output_queue, thread_count);
 
-      std::thread enqueue_thread(&AckermannWorker::enqueueVector, &worker, std::ref(input));
+      std::thread enqueue_thread(&util::Queue<AckermannInput>::enqueueVector, &(*input_queue), std::ref(input));
       std::thread dequeue_thread(&util::Queue<unsigned>::dequeueVector, &(*output_queue), std::ref(output));
 
       enqueue_thread.join();
