@@ -37,7 +37,7 @@ namespace util
     std::shared_ptr<util::Queue<T>> m_input_queue;
     std::shared_ptr<util::Queue<T>> m_output_queue;
 
-    MPI_Comm m_comm_all;
+    util::mpi::Communicator m_comm_all;
 
     std::vector<std::thread> m_signal_handler_threads;
     std::vector<std::thread> m_transmit_threads;
