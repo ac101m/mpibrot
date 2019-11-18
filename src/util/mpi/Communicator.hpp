@@ -34,9 +34,15 @@ namespace util
 
 
     public:
-      Communicator() :
-        m_communicator(MPI_COMM_NULL)
-      {}
+      Communicator()
+      {
+        int err = MPI_Comm_dup(MPI_COMM_WORLD, &m_communicator);
+        if(err)
+        {
+          std::cout << "MPI Error, code: " << err << "\n";
+          exit(1);
+        }
+      }
 
 
       operator MPI_Comm() const
@@ -49,9 +55,12 @@ namespace util
       {
         MPI_Comm new_communicator;
 
-        MPI_Comm_dup(
-          MPI_COMM_WORLD,
-          &new_communicator);
+        int err = MPI_Comm_dup(MPI_COMM_WORLD, &new_communicator);
+        if(err)
+        {
+          std::cout << "MPI Error, code: " << err << "\n";
+          exit(1);
+        }
 
         return Communicator(new_communicator);
       }
@@ -61,9 +70,12 @@ namespace util
       {
         MPI_Comm new_communicator;
 
-        MPI_Comm_dup(
-          MPI_COMM_SELF,
-          &new_communicator);
+        int err = MPI_Comm_dup(MPI_COMM_SELF, &new_communicator);
+        if(err)
+        {
+          std::cout << "MPI Error, code: " << err << "\n";
+          exit(1);
+        }
 
         return Communicator(new_communicator);
       }
@@ -73,9 +85,12 @@ namespace util
       {
         MPI_Comm new_communicator;
 
-        MPI_Comm_dup(
-          t_original,
-          &new_communicator);
+        int err = MPI_Comm_dup(t_original, &new_communicator);
+        if(err)
+        {
+          std::cout << "MPI Error, code: " << err << "\n";
+          exit(1);
+        }
 
         return Communicator(new_communicator);
       }
@@ -85,11 +100,12 @@ namespace util
       {
         MPI_Comm new_communicator;
 
-        MPI_Comm_split(
-          t_original,
-	        t_colour,
-	        t_key,
-          &new_communicator);
+        int err = MPI_Comm_split(t_original, t_colour, t_key, &new_communicator);
+        if(err)
+        {
+          std::cout << "MPI Error, code: " << err << "\n";
+          exit(1);
+        }
 
         return Communicator(new_communicator);
       }
@@ -98,7 +114,14 @@ namespace util
       int size() const
       {
         int communicator_size;
-        MPI_Comm_size(m_communicator, &communicator_size);
+
+        int err = MPI_Comm_size(m_communicator, &communicator_size);
+        if(err)
+        {
+          std::cout << "MPI Error, code: " << err << "\n";
+          exit(1);
+        }
+
         return communicator_size;
       }
 
@@ -106,7 +129,14 @@ namespace util
       int rank() const
       {
         int communicator_rank;
-        MPI_Comm_rank(m_communicator, &communicator_rank);
+
+        int err = MPI_Comm_rank(m_communicator, &communicator_rank);
+        if(err)
+        {
+          std::cout << "MPI Error, code: " << err << "\n";
+          exit(1);
+        }
+
         return communicator_rank;
       }
 
@@ -115,7 +145,12 @@ namespace util
       {
         if(this->lastReference())
         {
-          MPI_Comm_free(&m_communicator);
+          int err = MPI_Comm_free(&m_communicator);
+          if(err)
+          {
+            std::cout << "MPI Error, code: " << err << "\n";
+            exit(1);
+          }
         }
       }
     };
