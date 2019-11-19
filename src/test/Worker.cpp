@@ -13,18 +13,12 @@
 #include "util/Worker.hpp"
 
 
-class AckermannInput
+typedef struct
 {
-public:
-  bool stop = true;
   unsigned m = 0;
   unsigned n = 0;
-
-  friend bool operator!=(AckermannInput const& lhs, AckermannInput const& rhs)
-  {
-    return (lhs.m != rhs.m) || (lhs.n != rhs.n) || (lhs.stop != rhs.stop);
-  }
-};
+}
+AckermannInput;
 
 
 // Ackermanns function (yuck)
@@ -94,7 +88,7 @@ SCENARIO(
       unsigned random_m = rand() % (m_max + 1);
       unsigned random_n = rand() % (n_max + 1);
 
-      input[i] = {false, random_m, random_n};
+      input[i] = {random_m, random_n};
 
       expected_output[i] = ack_values[random_m][random_n];
     }
