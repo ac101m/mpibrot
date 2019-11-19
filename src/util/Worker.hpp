@@ -26,10 +26,7 @@ namespace util
 
 
   // Methods
-  protected:
-    virtual void processWorkItem(T_in t_work_item) = 0;
-
-
+  private:
     void workerMain()
     {
       T_in work_item;
@@ -39,6 +36,11 @@ namespace util
         processWorkItem(work_item);
       }
     }
+
+
+  // Methods
+  protected:
+    virtual void processWorkItem(T_in t_work_item) = 0;
 
 
   // Methods
