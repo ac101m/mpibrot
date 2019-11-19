@@ -1,13 +1,15 @@
 #ifndef MPIBROT_SYNCHRONIZED_QUEUE_INCLUDED
 #define MPIBROT_SYNCHRONIZED_QUEUE_INCLUDED
 
+
+// Internal
+#include "util/CountingSemaphore.hpp"
+
 // Standard
 #include <vector>
 #include <memory>
 #include <mutex>
-
-// Internal
-#include "util/CountingSemaphore.hpp"
+#include <utility>
 
 
 namespace util
