@@ -196,24 +196,15 @@ namespace util
 
       while(1)
       {
-        //std::cout << "[RX] - Sending rx request\n";
         this->sendRxRequest(t_signal_handler_rank);
-        //std::cout << "[RX] - Rx request sent\n";
-
-        //std::cout << "[RX] - Receiving rx response\n";
         tx_rank = this->receiveRxResponse(t_signal_handler_rank);
 
         if(tx_rank == MPIBROT_DISTRIBUTOR_STOP_SIGNAL)
         {
-          //std::cout << "[RX] - Receieved exit signal, exiting loop\n";
           break;
         }
 
-        //std::cout << "[RX] - Received response\n";
-
-        //std::cout << "[RX] - Receiving data from " << tx_rank << "\n";
         rx_data.mpiReceive(tx_rank, MPIBROT_DISTRIBUTOR_DATA_TAG, m_comm_all);
-        //std::cout << "[RX] - Received data\n";
 
         m_output_queue->enqueue(rx_data);
       }
