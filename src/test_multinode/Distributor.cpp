@@ -47,7 +47,7 @@ public:
     return m_value;
   }
 
-  void mpiSend(int const t_destination, int const t_tag, util::mpi::Communicator const t_comm) const
+  void mpiSend(int const t_destination, int const t_tag, MPI_Comm const t_comm) const
   {
     int err = MPI_Ssend(&m_value, 1, MPI_INT, t_destination, t_tag, t_comm);
     if(err)
@@ -57,7 +57,7 @@ public:
     }
   }
 
-  void mpiReceive(int const t_source, int const t_tag, util::mpi::Communicator const t_comm)
+  void mpiReceive(int const t_source, int const t_tag, MPI_Comm const t_comm)
   {
     MPI_Status status;
     int err = MPI_Recv(&m_value, 1, MPI_INT, t_source, t_tag, t_comm, &status);
@@ -79,19 +79,16 @@ SCENARIO(
   std::shared_ptr<util::Queue<TransmissableInt>> input_queue(new util::Queue<TransmissableInt>(input_queue_length));
   std::shared_ptr<util::Queue<TransmissableInt>> output_queue(new util::Queue<TransmissableInt>(output_queue_length));
 
-  util::mpi::Communicator comm_all = util::mpi::Communicator::world();
-  util::mpi::Communicator comm = util::mpi::Communicator::split(comm_all, comm_all.rank(), comm_all.rank());
-
-  util::Distributor<TransmissableInt> distributor(input_queue, output_queue);
+  util::Distributor<TransmissableInt> distributor(input_queue, output_queue, MPI_COMM_SELF);
 
   GIVEN("A vector of transmissable items")
   {
-    unsigned test_vector_length = 4;
+    unsigned test_vector_length = 65536;
 
     std::vector<TransmissableInt> input_vector = std::vector<TransmissableInt>(test_vector_length);
     std::vector<TransmissableInt> output_vector = std::vector<TransmissableInt>(test_vector_length);
 
-    for(unsigned i = 0; i < input_vector.size(); i++)
+    for(unsigned i = 0; i < test_vector_length; i++)
     {
       input_vector[i] = rand();
     }
