@@ -1,15 +1,14 @@
 #ifndef MPIBROT_WORK_QUEUE_INCLUDED
 #define MPIBROT_WORK_QUEUE_INCLUDED
 
+
+// Internal
+#include "util/Queue.hpp"
+
 // Standard
 #include <vector>
 #include <thread>
 #include <memory>
-
-// External
-
-// Internal
-#include "util/Queue.hpp"
 
 
 namespace util
