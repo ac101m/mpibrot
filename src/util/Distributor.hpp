@@ -46,8 +46,6 @@ namespace util
     int const m_my_signal_group;
     int const m_my_signal_handler_rank;
 
-    T const m_terminate_value;
-
 
   // Methods
   private:
@@ -213,14 +211,21 @@ namespace util
 
     void transmitThreadMain()
     {
-      T tx_data;
+      std::pair<int, T> tx_signal_data_pair;
       int rx_rank;
 
-      while((tx_data = this->m_input_queue->dequeue()) != m_terminate_value)
+      while(1)
       {
+        tx_signal_data_pair = m_input_queue->dequeueWithSignal();
+
+        if(tx_signal_data_pair.first == MPIBROT_DISTRIBUTOR_STOP_SIGNAL)
+        {
+          break;
+        }
+
         this->sendTxRequest(m_my_signal_handler_rank);
         rx_rank = this->receiveTxResponse(m_my_signal_handler_rank);
-        tx_data.mpiSend(rx_rank, MPIBROT_DISTRIBUTOR_DATA_TAG, m_comm_all);
+        tx_signal_data_pair.second.mpiSend(rx_rank, MPIBROT_DISTRIBUTOR_DATA_TAG, m_comm_all);
       }
     }
 
@@ -233,15 +238,13 @@ namespace util
       MPI_Comm const t_basis_communicator,
       unsigned const t_signal_group_count = 1,
       unsigned const t_transmit_thread_count = 1,
-      unsigned const t_signal_thread_count = 1,
-      T const t_terminate_value = T()) :
+      unsigned const t_signal_thread_count = 1) :
       m_input_queue(t_input_queue),
       m_output_queue(t_output_queue),
       m_comm_all(t_basis_communicator),
       m_signal_group_size((this->commSize() + (t_signal_group_count / 2)) / t_signal_group_count),
       m_my_signal_group(this->commRank() / m_signal_group_size),
-      m_my_signal_handler_rank(m_my_signal_group * m_signal_group_size),
-      m_terminate_value(t_terminate_value)
+      m_my_signal_handler_rank(m_my_signal_group * m_signal_group_size)
     {
       std::cout << "Signal group size: " << m_signal_group_size << "\n";
       std::cout << "Signal group: " << m_my_signal_group << "\n";
@@ -286,7 +289,7 @@ namespace util
       // Send stop signals to transmit threads
       for(unsigned i = 0; i < m_transmit_threads.size(); i++)
       {
-        this->m_input_queue->enqueue(m_terminate_value);
+        this->m_input_queue->enqueueWithSignal(std::make_pair(MPIBROT_DISTRIBUTOR_STOP_SIGNAL, T()));
       }
 
       // Join transmit threads
