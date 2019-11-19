@@ -2,17 +2,17 @@
 #define MPIBROT_DISTRIBUTOR_INCLUDED
 
 
+// Internal
+#include "util/Queue.hpp"
+
+// External
+#include "mpi.h"
+
 // Standard
 #include <vector>
 #include <memory>
 #include <thread>
 #include <iostream>
-
-// External
-#include "mpi.h"
-
-// Internal
-#include "util/Queue.hpp"
 
 
 // Communication tags
