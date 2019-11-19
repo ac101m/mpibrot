@@ -11,6 +11,10 @@
 #include <memory>
 
 
+// Worker exit signal value
+#define MPIBROT_WORKER_EXIT_SIGNAL -1
+
+
 namespace util
 {
 
@@ -22,18 +26,23 @@ namespace util
 
     std::vector<std::thread> m_worker_threads;
 
-    T_in const m_shutdown_signal_value;
-
 
   // Methods
   private:
     void workerMain()
     {
-      T_in work_item;
+      std::pair<int, T_in> data_signal_pair;
 
-      while((work_item = m_input_queue->dequeue()) != m_shutdown_signal_value)
+      while(1)
       {
-        processWorkItem(work_item);
+        data_signal_pair = m_input_queue->dequeueWithSignal();
+
+        if(data_signal_pair.first == MPIBROT_WORKER_EXIT_SIGNAL)
+        {
+          break;
+        }
+
+        processWorkItem(data_signal_pair.second);
       }
     }
 
@@ -47,11 +56,9 @@ namespace util
   public:
     Worker(
       std::shared_ptr<Queue<T_in>> t_input_queue,
-      unsigned const t_thread_count,
-      T_in const t_shutdown_signal_value = T_in()) :    // Value of T_in which should initiate worker thread shutdown
+      unsigned const t_thread_count) :
       m_input_queue(t_input_queue),
-      m_worker_threads(std::vector<std::thread>(t_thread_count)),
-      m_shutdown_signal_value(t_shutdown_signal_value)
+      m_worker_threads(std::vector<std::thread>(t_thread_count))
     {
       for(unsigned i = 0; i < t_thread_count; i++)
       {
@@ -70,7 +77,7 @@ namespace util
     {
       for(unsigned i = 0; i < m_worker_threads.size(); i++)
       {
-        m_input_queue->enqueue(m_shutdown_signal_value);
+        m_input_queue->enqueueWithSignal(std::make_pair(MPIBROT_WORKER_EXIT_SIGNAL, T_in()));
       }
 
       for(unsigned i = 0; i < m_worker_threads.size(); i++)
