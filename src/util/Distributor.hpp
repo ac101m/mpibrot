@@ -246,10 +246,6 @@ namespace util
       m_my_signal_group(this->commRank() / m_signal_group_size),
       m_my_signal_handler_rank(m_my_signal_group * m_signal_group_size)
     {
-      std::cout << "Signal group size: " << m_signal_group_size << "\n";
-      std::cout << "Signal group: " << m_my_signal_group << "\n";
-      std::cout << "Signal handler rank: " << m_my_signal_handler_rank << "\n";
-
       // Start transmit threads
       for(unsigned i = 0; i < t_transmit_thread_count; i++)
       {
