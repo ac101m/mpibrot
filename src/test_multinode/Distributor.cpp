@@ -27,16 +27,6 @@ public:
     return (lhs.m_value == rhs.m_value);
   }
 
-  friend bool operator!=(TransmissableInt const & lhs, TransmissableInt const & rhs)
-  {
-    return !(lhs == rhs);
-  }
-
-  friend bool operator>(TransmissableInt const & lhs, TransmissableInt const & rhs)
-  {
-    return (lhs.m_value > rhs.m_value);
-  }
-
   friend bool operator<(TransmissableInt const & lhs, TransmissableInt const & rhs)
   {
     return (lhs.m_value < rhs.m_value);
