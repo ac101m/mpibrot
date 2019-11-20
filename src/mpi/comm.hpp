@@ -1,5 +1,5 @@
-#ifndef UTIL_MPI_COMM_INCLUDED
-#define UTIL_MPI_COMM_INCLUDED
+#ifndef MPIBROT_UTIL_MPI_COMM_INCLUDED
+#define MPIBROT_UTIL_MPI_COMM_INCLUDED
 
 
 // External
@@ -50,4 +50,4 @@ namespace mpi
 } // namespace mpi
 
 
-#endif // UTIL_MPI_COMM_INCLUDED
+#endif // MPIBROT_UTIL_MPI_COMM_INCLUDED
