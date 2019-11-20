@@ -4,6 +4,7 @@
 
 // Internal
 #include "mpi/Transmissable.hpp"
+#include "mpi/error.hpp"
 
 // External
 #include "mpi.h"
@@ -39,23 +40,13 @@ public:
 
   void mpiSend(int const t_destination, int const t_tag, MPI_Comm const t_comm) const
   {
-    int err = MPI_Ssend(&m_value, 1, MPI_INT, t_destination, t_tag, t_comm);
-    if(err)
-    {
-      std::cout << "MPI Error, code: " << err << "\n";
-      exit(1);
-    }
+    mpi::error::check(MPI_Ssend(&m_value, 1, MPI_INT, t_destination, t_tag, t_comm));
   }
 
   void mpiReceive(int const t_source, int const t_tag, MPI_Comm const t_comm)
   {
     MPI_Status status;
-    int err = MPI_Recv(&m_value, 1, MPI_INT, t_source, t_tag, t_comm, &status);
-    if(err)
-    {
-      std::cout << "MPI Error, code: " << err << "\n";
-      exit(1);
-    }
+    mpi::error::check(MPI_Recv(&m_value, 1, MPI_INT, t_source, t_tag, t_comm, &status));
   }
 };
 
