@@ -6,6 +6,9 @@
 #include <string>
 #include <exception>
 
+// External
+#include "mpi.h"
+
 
 namespace mpi
 {
