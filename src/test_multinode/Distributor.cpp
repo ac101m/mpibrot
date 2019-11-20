@@ -25,7 +25,7 @@ SCENARIO(
 
   GIVEN("A vector of transmissable items")
   {
-    unsigned test_vector_length = 256;
+    unsigned test_vector_length = 1024;
 
     std::vector<TransmissableInt> input_vector = std::vector<TransmissableInt>(test_vector_length);
     std::vector<TransmissableInt> output_vector = std::vector<TransmissableInt>(test_vector_length);
