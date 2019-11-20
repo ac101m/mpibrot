@@ -1,5 +1,5 @@
-#ifndef MPIBROT_DISTRIBUTOR_INCLUDED
-#define MPIBROT_DISTRIBUTOR_INCLUDED
+#ifndef MPIBROT_UTIL_DISTRIBUTOR_INCLUDED
+#define MPIBROT_UTIL_DISTRIBUTOR_INCLUDED
 
 
 // Internal
@@ -18,14 +18,14 @@
 
 
 // Communication tags
-#define MPIBROT_DISTRIBUTOR_TX_REQUEST_TAG 0
-#define MPIBROT_DISTRIBUTOR_TX_RESPONSE_TAG 1
-#define MPIBROT_DISTRIBUTOR_RX_REQUEST_TAG 2
-#define MPIBROT_DISTRIBUTOR_RX_RESPONSE_TAG 3
-#define MPIBROT_DISTRIBUTOR_DATA_TAG 4
+#define MPIBROT_UTIL_DISTRIBUTOR_TX_REQUEST_TAG 0
+#define MPIBROT_UTIL_DISTRIBUTOR_TX_RESPONSE_TAG 1
+#define MPIBROT_UTIL_DISTRIBUTOR_RX_REQUEST_TAG 2
+#define MPIBROT_UTIL_DISTRIBUTOR_RX_RESPONSE_TAG 3
+#define MPIBROT_UTIL_DISTRIBUTOR_DATA_TAG 4
 
 // Stop signal
-#define MPIBROT_DISTRIBUTOR_STOP_SIGNAL -1
+#define MPIBROT_UTIL_DISTRIBUTOR_STOP_SIGNAL -1
 
 
 namespace util
@@ -80,55 +80,55 @@ namespace util
 
     void sendRxRequest(int const t_signal_handler_rank)
     {
-      this->sendRankNumber(t_signal_handler_rank, MPIBROT_DISTRIBUTOR_RX_REQUEST_TAG);
+      this->sendRankNumber(t_signal_handler_rank, MPIBROT_UTIL_DISTRIBUTOR_RX_REQUEST_TAG);
     }
 
 
     int receiveRxRequest()
     {
-      return this->receiveRankNumber(MPI_ANY_SOURCE, MPIBROT_DISTRIBUTOR_RX_REQUEST_TAG);
+      return this->receiveRankNumber(MPI_ANY_SOURCE, MPIBROT_UTIL_DISTRIBUTOR_RX_REQUEST_TAG);
     }
 
 
     void sendRxResponse(int const t_destination, int const t_value)
     {
-      this->sendInt(t_destination, MPIBROT_DISTRIBUTOR_RX_RESPONSE_TAG, t_value);
+      this->sendInt(t_destination, MPIBROT_UTIL_DISTRIBUTOR_RX_RESPONSE_TAG, t_value);
     }
 
 
     int receiveRxResponse(int const t_source)
     {
-      return this->receiveInt(t_source, MPIBROT_DISTRIBUTOR_RX_RESPONSE_TAG);
+      return this->receiveInt(t_source, MPIBROT_UTIL_DISTRIBUTOR_RX_RESPONSE_TAG);
     }
 
 
     void sendTxRequest(int const t_destination)
     {
-      this->sendRankNumber(t_destination, MPIBROT_DISTRIBUTOR_TX_REQUEST_TAG);
+      this->sendRankNumber(t_destination, MPIBROT_UTIL_DISTRIBUTOR_TX_REQUEST_TAG);
     }
 
 
     void sendTxStopRequest(int const t_destination)
     {
-      this->sendInt(t_destination, MPIBROT_DISTRIBUTOR_TX_REQUEST_TAG, MPIBROT_DISTRIBUTOR_STOP_SIGNAL);
+      this->sendInt(t_destination, MPIBROT_UTIL_DISTRIBUTOR_TX_REQUEST_TAG, MPIBROT_UTIL_DISTRIBUTOR_STOP_SIGNAL);
     }
 
 
     int receiveTxRequest()
     {
-      return this->receiveRankNumber(MPI_ANY_SOURCE, MPIBROT_DISTRIBUTOR_TX_REQUEST_TAG);
+      return this->receiveRankNumber(MPI_ANY_SOURCE, MPIBROT_UTIL_DISTRIBUTOR_TX_REQUEST_TAG);
     }
 
 
     void sendTxResponse(int const t_destination, int const t_response)
     {
-      this->sendInt(t_destination, MPIBROT_DISTRIBUTOR_TX_RESPONSE_TAG, t_response);
+      this->sendInt(t_destination, MPIBROT_UTIL_DISTRIBUTOR_TX_RESPONSE_TAG, t_response);
     }
 
 
     int receiveTxResponse(int const t_source)
     {
-      return this->receiveInt(t_source, MPIBROT_DISTRIBUTOR_TX_RESPONSE_TAG);
+      return this->receiveInt(t_source, MPIBROT_UTIL_DISTRIBUTOR_TX_RESPONSE_TAG);
     }
 
 
@@ -140,7 +140,7 @@ namespace util
       {
         tx_request_rank = this->receiveTxRequest();
 
-        if(tx_request_rank == MPIBROT_DISTRIBUTOR_STOP_SIGNAL)
+        if(tx_request_rank == MPIBROT_UTIL_DISTRIBUTOR_STOP_SIGNAL)
         {
           break;
         }
@@ -163,12 +163,12 @@ namespace util
         this->sendRxRequest(t_signal_handler_rank);
         tx_rank = this->receiveRxResponse(t_signal_handler_rank);
 
-        if(tx_rank == MPIBROT_DISTRIBUTOR_STOP_SIGNAL)
+        if(tx_rank == MPIBROT_UTIL_DISTRIBUTOR_STOP_SIGNAL)
         {
           break;
         }
 
-        rx_data.mpiReceive(tx_rank, MPIBROT_DISTRIBUTOR_DATA_TAG, m_comm_all);
+        rx_data.mpiReceive(tx_rank, MPIBROT_UTIL_DISTRIBUTOR_DATA_TAG, m_comm_all);
 
         m_output_queue->enqueue(rx_data);
       }
@@ -184,14 +184,14 @@ namespace util
       {
         tx_signal_data_pair = m_input_queue->dequeueWithSignal();
 
-        if(tx_signal_data_pair.first == MPIBROT_DISTRIBUTOR_STOP_SIGNAL)
+        if(tx_signal_data_pair.first == MPIBROT_UTIL_DISTRIBUTOR_STOP_SIGNAL)
         {
           break;
         }
 
         this->sendTxRequest(m_my_signal_handler_rank);
         rx_rank = this->receiveTxResponse(m_my_signal_handler_rank);
-        tx_signal_data_pair.second.mpiSend(rx_rank, MPIBROT_DISTRIBUTOR_DATA_TAG, m_comm_all);
+        tx_signal_data_pair.second.mpiSend(rx_rank, MPIBROT_UTIL_DISTRIBUTOR_DATA_TAG, m_comm_all);
       }
     }
 
@@ -251,7 +251,7 @@ namespace util
       // Send stop signals to transmit threads
       for(unsigned i = 0; i < m_transmit_threads.size(); i++)
       {
-        this->m_input_queue->enqueueWithSignal(std::make_pair(MPIBROT_DISTRIBUTOR_STOP_SIGNAL, T()));
+        this->m_input_queue->enqueueWithSignal(std::make_pair(MPIBROT_UTIL_DISTRIBUTOR_STOP_SIGNAL, T()));
       }
 
       // Join transmit threads
@@ -278,7 +278,7 @@ namespace util
         for(int i = 0; i < mpi::comm::size(m_comm_all); i++)
         {
           int rx_rank = this->receiveRxRequest();
-          this->sendRxResponse(rx_rank, MPIBROT_DISTRIBUTOR_STOP_SIGNAL);
+          this->sendRxResponse(rx_rank, MPIBROT_UTIL_DISTRIBUTOR_STOP_SIGNAL);
         }
       }
 
@@ -295,4 +295,4 @@ namespace util
 } // namespace util
 
 
-#endif // MPIBROT_DISTRIBUTOR_INCLUDED
+#endif // MPIBROT_UTIL_DISTRIBUTOR_INCLUDED
