@@ -51,32 +51,6 @@ namespace util
 
   // Methods
   private:
-    int commSize()
-    {
-      int comm_size;
-      int err = MPI_Comm_size(m_comm_all, &comm_size);
-      if(err)
-      {
-        std::cout << "MPI Error, code: " << err << "\n";
-        exit(1);
-      }
-      return comm_size;
-    }
-
-
-    int commRank()
-    {
-      int comm_rank;
-      int err = MPI_Comm_rank(m_comm_all, &comm_rank);
-      if(err)
-      {
-        std::cout << "MPI Error, code: " << err << "\n";
-        exit(1);
-      }
-      return comm_rank;
-    }
-
-
     void sendInt(int const t_destination, int const t_tag, int const t_value)
     {
       int err = MPI_Ssend(&t_value, 1, MPI_INT, t_destination, t_tag, m_comm_all);
@@ -104,7 +78,7 @@ namespace util
 
     void sendRankNumber(int const t_destination, int const t_tag)
     {
-      this->sendInt(t_destination, t_tag, this->commRank());
+      this->sendInt(t_destination, t_tag, mpi::comm::rank(m_comm_all));
     }
 
 
@@ -244,8 +218,8 @@ namespace util
       m_input_queue(t_input_queue),
       m_output_queue(t_output_queue),
       m_comm_all(mpi::comm::duplicate(t_basis_communicator)),
-      m_signal_group_size((this->commSize() + (t_signal_group_count / 2)) / t_signal_group_count),
-      m_my_signal_group(this->commRank() / m_signal_group_size),
+      m_signal_group_size((mpi::comm::size(m_comm_all) + (t_signal_group_count / 2)) / t_signal_group_count),
+      m_my_signal_group(mpi::comm::rank(m_comm_all) / m_signal_group_size),
       m_my_signal_handler_rank(m_my_signal_group * m_signal_group_size)
     {
       // Start transmit threads
@@ -256,11 +230,11 @@ namespace util
 
       // Get vector of all ranks with signal handlers running on them
       std::vector<int> signal_handler_ranks;
-      for(int i = 0; i < this->commSize(); i++)
+      for(int i = 0; i < mpi::comm::size(m_comm_all); i++)
       {
-        if((this->commRank() % m_signal_group_size) == 0)
+        if((mpi::comm::rank(m_comm_all) % m_signal_group_size) == 0)
         {
-          signal_handler_ranks.push_back(this->commRank());
+          signal_handler_ranks.push_back(mpi::comm::rank(m_comm_all));
         }
       }
 
@@ -272,7 +246,7 @@ namespace util
       }
 
       // Start signal handlers
-      if(this->commRank() == m_my_signal_handler_rank)
+      if(mpi::comm::rank(m_comm_all) == m_my_signal_handler_rank)
       {
         for(unsigned i = 0; i < t_signal_thread_count; i++)
         {
@@ -299,7 +273,7 @@ namespace util
       // Send stop signals to signal handlers on this rank
       for(unsigned i = 0; i < m_signal_handler_threads.size(); i++)
       {
-        this->sendTxStopRequest(this->commRank());
+        this->sendTxStopRequest(mpi::comm::rank(m_comm_all));
       }
 
       // Join signal handler threads
@@ -309,9 +283,9 @@ namespace util
       }
 
       // Send stop signals to receive threads
-      if(this->commRank() == m_my_signal_handler_rank)
+      if(mpi::comm::rank(m_comm_all) == m_my_signal_handler_rank)
       {
-        for(int i = 0; i < this->commSize(); i++)
+        for(int i = 0; i < mpi::comm::size(m_comm_all); i++)
         {
           int rx_rank = this->receiveRxRequest();
           this->sendRxResponse(rx_rank, MPIBROT_DISTRIBUTOR_STOP_SIGNAL);
