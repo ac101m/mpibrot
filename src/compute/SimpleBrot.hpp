@@ -1,6 +1,7 @@
 #ifndef MPIBROT_SIMPLEBROT_INCLUDED
 #define MPIBROT_SIMPLEBROT_INCLUDED
 
+
 // Internal
 #include "util/Buffer2D.hpp"
 

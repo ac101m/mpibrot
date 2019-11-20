@@ -2,15 +2,15 @@
 #include "catch.hpp"
 
 
+// Internal
+#include "util/Worker.hpp"
+
 // Standard
 #include <vector>
 #include <iostream>
 #include <memory>
 #include "stdlib.h"
 #include "time.h"
-
-// Internal
-#include "util/Worker.hpp"
 
 
 typedef struct

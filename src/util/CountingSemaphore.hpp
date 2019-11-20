@@ -1,6 +1,7 @@
 #ifndef MPIBROT_COUNTING_SEMAPHORE_INCLUDED
 #define MPIBROT_COUNTING_SEMAPHORE_INCLUDED
 
+
 // Standard
 #include <mutex>
 #include <condition_variable>

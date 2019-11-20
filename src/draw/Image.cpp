@@ -1,3 +1,5 @@
+
+// Internal
 #include "draw/Image.hpp"
 
 // Standard

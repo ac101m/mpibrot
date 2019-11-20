@@ -1,16 +1,19 @@
 #ifndef MPIBROT_IMAGE_INCLUDED
 #define MPIBROT_IMAGE_INCLUDED
 
-// Standard
-#include <vector>
-#include <string>
-#include <memory>
+
+// Internal
+#include "util/Buffer2D.hpp"
 
 // External
 #include "GLT/GL/ShaderProgram.hpp"
 #include "GLT/GL/VertexArray.hpp"
 #include "GLT/GL/Texture2D.hpp"
-#include "util/Buffer2D.hpp"
+
+// Standard
+#include <vector>
+#include <string>
+#include <memory>
 
 
 // Struct for pixel data

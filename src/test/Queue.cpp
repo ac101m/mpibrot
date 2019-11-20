@@ -2,15 +2,15 @@
 #include "catch.hpp"
 
 
+// Internal
+#include "util/Queue.hpp"
+
 // Standard
 #include <vector>
 #include <thread>
 #include <algorithm>
 #include <stdlib.h>
 #include <time.h>
-
-// Internal
-#include "util/Queue.hpp"
 
 
 std::vector<int> genTestVector(

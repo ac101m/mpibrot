@@ -2,11 +2,11 @@
 #define MPIBROT_UTIL_MPI_COMM_INCLUDED
 
 
-// External
-#include "mpi.h"
-
 // Internal
 #include "mpi/error.hpp"
+
+// External
+#include "mpi.h"
 
 
 namespace mpi

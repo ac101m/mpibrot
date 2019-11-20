@@ -2,11 +2,11 @@
 #include "catch.hpp"
 
 
-// Standard
-#include <thread>
-
 // Internal
 #include "util/CountingSemaphore.hpp"
+
+// Standard
+#include <thread>
 
 
 // Give a semaphore a bunch of times
