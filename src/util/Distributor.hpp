@@ -4,6 +4,8 @@
 
 // Internal
 #include "util/Queue.hpp"
+#include "mpi/error.hpp"
+#include "mpi/comm.hpp"
 
 // External
 #include "mpi.h"
@@ -36,7 +38,7 @@ namespace util
     std::shared_ptr<util::Queue<T>> m_input_queue;
     std::shared_ptr<util::Queue<T>> m_output_queue;
 
-    MPI_Comm const m_comm_all;
+    MPI_Comm m_comm_all;
 
     std::vector<std::thread> m_signal_handler_threads;
     std::vector<std::thread> m_transmit_threads;
@@ -241,7 +243,7 @@ namespace util
       unsigned const t_signal_thread_count = 1) :
       m_input_queue(t_input_queue),
       m_output_queue(t_output_queue),
-      m_comm_all(t_basis_communicator),
+      m_comm_all(mpi::comm::duplicate(t_basis_communicator)),
       m_signal_group_size((this->commSize() + (t_signal_group_count / 2)) / t_signal_group_count),
       m_my_signal_group(this->commRank() / m_signal_group_size),
       m_my_signal_handler_rank(m_my_signal_group * m_signal_group_size)
@@ -321,6 +323,8 @@ namespace util
       {
         m_receive_threads.at(i).join();
       }
+
+      mpi::error::check(MPI_Comm_free(&m_comm_all));
     }
   };
 
