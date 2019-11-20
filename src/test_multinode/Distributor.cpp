@@ -4,7 +4,7 @@
 
 // Internal
 #include "util/Distributor.hpp"
-#include "util/mpi/Transmissable.hpp"
+#include "mpi/Transmissable.hpp"
 
 // Standard
 #include <vector>
@@ -12,7 +12,7 @@
 #include <algorithm>
 
 
-class TransmissableInt : public util::mpi::Transmissable
+class TransmissableInt : public mpi::Transmissable
 {
 private:
   int m_value;
@@ -128,7 +128,7 @@ SCENARIO(
   std::shared_ptr<util::Queue<TransmissableInt>> input_queue(new util::Queue<TransmissableInt>(input_queue_length));
   std::shared_ptr<util::Queue<TransmissableInt>> output_queue(new util::Queue<TransmissableInt>(output_queue_length));
 
-  util::mpi::Communicator communicator = util::mpi::Communicator::world();
+  mpi::Communicator communicator = mpi::Communicator::world();
 
   util::Distributor<TransmissableInt> distributor(input_queue, output_queue, 1, 1, 1, communicator);
 

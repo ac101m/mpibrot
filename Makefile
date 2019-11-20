@@ -39,7 +39,7 @@ TEST_SRCS_MULTINODE := $(shell $(FIND_NON_MAIN_SRCS) | grep -v /draw/ | grep -v 
 TEST_OBJS_MULTINODE := $(TEST_SRCS_MULTINODE:%=$(OBJ_DIR)/test_multinode/%.o)
 
 # Client sources and objects (nothing from compute directory)
-CLIENT_SRCS := $(shell $(FIND_NON_MAIN_SRCS) | grep -v /compute/ | grep -v /test/ | grep -v /test_multinode/) src/client_main.cpp
+CLIENT_SRCS := $(shell $(FIND_NON_MAIN_SRCS) | grep -v /compute/ | grep -v /test/ | grep -v /test_multinode/ | grep -v /mpi/) src/client_main.cpp
 CLIENT_DEBUG_OBJS := $(CLIENT_SRCS:%=$(OBJ_DIR)/client-debug/%.o)
 CLIENT_RELEASE_OBJS := $(CLIENT_SRCS:%=$(OBJ_DIR)/client-release/%.o)
 
