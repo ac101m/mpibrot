@@ -53,12 +53,7 @@ namespace util
   private:
     void sendInt(int const t_destination, int const t_tag, int const t_value)
     {
-      int err = MPI_Ssend(&t_value, 1, MPI_INT, t_destination, t_tag, m_comm_all);
-      if(err)
-      {
-        std::cout << "MPI Error, code: " << err << "\n";
-        exit(1);
-      }
+      mpi::error::check(MPI_Ssend(&t_value, 1, MPI_INT, t_destination, t_tag, m_comm_all));
     }
 
 
@@ -66,12 +61,7 @@ namespace util
     {
       int value;
       MPI_Status status;
-      int err = MPI_Recv(&value, 1, MPI_INT, t_source, t_tag, m_comm_all, &status);
-      if(err)
-      {
-        std::cout << "MPI Error, code: " << err << "\n";
-        exit(1);
-      }
+      mpi::error::check(MPI_Recv(&value, 1, MPI_INT, t_source, t_tag, m_comm_all, &status));
       return value;
     }
 
