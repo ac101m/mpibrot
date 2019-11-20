@@ -14,7 +14,7 @@ namespace mpi
 
     inline char * c_string(int const t_errorcode)
     {
-      char error_string = new char[MPI_MAX_ERROR_STRING];
+      char * error_string = new char[MPI_MAX_ERROR_STRING];
       int error_string_length;
 
       MPI_Error_string(t_errorcode, error_string, &error_string_length);
