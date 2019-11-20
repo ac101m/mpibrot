@@ -83,7 +83,7 @@ SCENARIO(
 
   GIVEN("A vector of transmissable items")
   {
-    unsigned test_vector_length = 65536;
+    unsigned test_vector_length = 256;
 
     std::vector<TransmissableInt> input_vector = std::vector<TransmissableInt>(test_vector_length);
     std::vector<TransmissableInt> output_vector = std::vector<TransmissableInt>(test_vector_length);
@@ -105,11 +105,6 @@ SCENARIO(
       {
         std::sort(input_vector.begin(), input_vector.end());
         std::sort(output_vector.begin(), output_vector.end());
-
-        for(unsigned i = 0; i < input_vector.size(); i++)
-        {
-          std::cout << i << ") in: " << input_vector[i] << " out: " << output_vector[i] << "\n";
-        }
 
         bool vectors_match = (input_vector == output_vector);
         REQUIRE(vectors_match == true);
