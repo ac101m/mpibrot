@@ -246,6 +246,11 @@ namespace util
     }
 
 
+    // Moveable but not copyable
+    Scatterer(Scatterer const &) = delete;
+    Scatterer& operator=(Scatterer const &) = delete;
+
+
     ~Distributor()
     {
       // Send stop signals to transmit threads
