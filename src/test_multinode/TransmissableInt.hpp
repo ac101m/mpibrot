@@ -40,13 +40,21 @@ public:
 
   void mpiSend(int const t_destination, int const t_tag, MPI_Comm const t_comm) const
   {
-    mpi::error::check(MPI_Ssend(&m_value, 1, MPI_INT, t_destination, t_tag, t_comm));
+    unsigned char const * const buf = (unsigned char *)&m_value;
+    mpi::error::check(MPI_Send(&buf[0], 1, MPI_BYTE, t_destination, t_tag, t_comm));
+    mpi::error::check(MPI_Send(&buf[1], 1, MPI_BYTE, t_destination, t_tag, t_comm));
+    mpi::error::check(MPI_Send(&buf[2], 1, MPI_BYTE, t_destination, t_tag, t_comm));
+    mpi::error::check(MPI_Send(&buf[3], 1, MPI_BYTE, t_destination, t_tag, t_comm));
   }
 
   void mpiReceive(int const t_source, int const t_tag, MPI_Comm const t_comm)
   {
     MPI_Status status;
-    mpi::error::check(MPI_Recv(&m_value, 1, MPI_INT, t_source, t_tag, t_comm, &status));
+    unsigned char * const buf = (unsigned char *)&m_value;
+    mpi::error::check(MPI_Recv(&buf[0], 1, MPI_BYTE, t_source, t_tag, t_comm, &status));
+    mpi::error::check(MPI_Recv(&buf[1], 1, MPI_BYTE, t_source, t_tag, t_comm, &status));
+    mpi::error::check(MPI_Recv(&buf[2], 1, MPI_BYTE, t_source, t_tag, t_comm, &status));
+    mpi::error::check(MPI_Recv(&buf[3], 1, MPI_BYTE, t_source, t_tag, t_comm, &status));
   }
 };
 
