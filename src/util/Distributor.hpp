@@ -247,8 +247,8 @@ namespace util
 
 
     // Moveable but not copyable
-    Scatterer(Scatterer const &) = delete;
-    Scatterer& operator=(Scatterer const &) = delete;
+    Distributor(Distributor const &) = delete;
+    Distributor& operator=(Distributor const &) = delete;
 
 
     ~Distributor()
