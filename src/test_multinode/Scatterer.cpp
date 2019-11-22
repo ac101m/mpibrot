@@ -64,7 +64,7 @@ SCENARIO(
 
     util::Scatterer<TransmissableInt> scatterer(input_queue, output_queue, MPI_COMM_SELF, head_node, tx_threads, rx_threads);
 
-    WHEN("A vector of tranmissable items is passed through the scatterer")
+    WHEN("A vector of transmissable items is passed through the scatterer")
     {
       std::thread enqueue_thread(&util::Queue<TransmissableInt>::enqueueVector, &(*input_queue), std::ref(input_vector));
       std::thread dequeue_thread(&util::Queue<TransmissableInt>::dequeueVector, &(*output_queue), std::ref(output_vector));
