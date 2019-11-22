@@ -9,9 +9,6 @@
 // External
 #include "mpi.h"
 
-// Standard
-#include <iostream>
-
 
 class TransmissableInt : public mpi::Transmissable
 {
