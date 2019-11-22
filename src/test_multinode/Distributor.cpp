@@ -33,11 +33,11 @@ SCENARIO(
 
   GIVEN("A distributor with one send and receive thread")
   {
-    unsigned tx_threads = 1;
-    unsigned rx_threads = 1;
     unsigned signal_groups = 1;
+    unsigned tx_threads = 1;
+    unsigned signal_threads = 1;
 
-    util::Distributor<TransmissableInt> distributor(input_queue, output_queue, MPI_COMM_SELF, signal_groups, tx_threads, rx_threads);
+    util::Distributor<TransmissableInt> distributor(input_queue, output_queue, MPI_COMM_SELF, signal_groups, tx_threads, signal_threads);
 
     WHEN("The vector is enqueued and dequeued on the same rank")
     {
@@ -60,11 +60,11 @@ SCENARIO(
 
   GIVEN("A distributor with multiple send and receive thread")
   {
-    unsigned tx_threads = 4;
-    unsigned rx_threads = 4;
     unsigned signal_groups = 1;
+    unsigned tx_threads = 4;
+    unsigned signal_threads = 4;
 
-    util::Distributor<TransmissableInt> distributor(input_queue, output_queue, MPI_COMM_SELF, signal_groups, tx_threads, rx_threads);
+    util::Distributor<TransmissableInt> distributor(input_queue, output_queue, MPI_COMM_SELF, signal_groups, tx_threads, signal_threads);
 
     WHEN("The vector is enqueued and dequeued on the same rank")
     {
