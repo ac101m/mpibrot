@@ -16,7 +16,6 @@ SCENARIO(
 {
   unsigned input_queue_length = 4;
   unsigned output_queue_length = 4;
-  unsigned head_node = 0;
 
   std::shared_ptr<util::Queue<TransmissableInt>> input_queue(new util::Queue<TransmissableInt>(input_queue_length));
   std::shared_ptr<util::Queue<TransmissableInt>> output_queue(new util::Queue<TransmissableInt>(output_queue_length));
@@ -33,6 +32,7 @@ SCENARIO(
 
   GIVEN("A gatherer with one transmit and one receive thread")
   {
+    unsigned head_node = 0;
     unsigned tx_threads = 1;
     unsigned rx_threads = 1;
 
@@ -59,6 +59,7 @@ SCENARIO(
 
   GIVEN("A gatherer with multiple transmit and receive threads")
   {
+    unsigned head_node = 0;
     unsigned tx_threads = 4;
     unsigned rx_threads = 4;
 
@@ -79,6 +80,113 @@ SCENARIO(
 
         bool vectors_match = (input_vector == output_vector);
         REQUIRE(vectors_match == true);
+      }
+    }
+  }
+}
+
+
+SCENARIO(
+  "[Gatherer] - Multi rank test")
+{
+  unsigned input_queue_length = 4;
+  unsigned output_queue_length = 4;
+
+  std::shared_ptr<util::Queue<TransmissableInt>> input_queue(new util::Queue<TransmissableInt>(input_queue_length));
+  std::shared_ptr<util::Queue<TransmissableInt>> output_queue(nullptr);
+
+  MPI_Comm communicator = MPI_COMM_WORLD;
+
+  unsigned test_vector_length = 64;
+
+  std::vector<TransmissableInt> input_vector = std::vector<TransmissableInt>(test_vector_length);
+  std::vector<TransmissableInt> output_vector = std::vector<TransmissableInt>(test_vector_length * mpi::comm::size(communicator));
+  std::vector<TransmissableInt> expected_output = std::vector<TransmissableInt>(test_vector_length * mpi::comm::size(communicator));
+
+  for(unsigned i = 0; i < input_vector.size(); i++)
+  {
+    input_vector[i] = (mpi::comm::rank(communicator) * input_vector.size()) + i;
+  }
+
+  for(unsigned i = 0; i < expected_output.size(); i++)
+  {
+    expected_output[i] = i;
+  }
+
+  GIVEN("A gatherer with one transmit and one receive thread")
+  {
+    int head_node = 0;
+    unsigned tx_threads = 1;
+    unsigned rx_threads = 1;
+
+    if(mpi::comm::rank(communicator) == head_node)
+    {
+      output_queue = std::shared_ptr<util::Queue<TransmissableInt>>(new util::Queue<TransmissableInt>(output_queue_length));
+    }
+
+    util::Gatherer<TransmissableInt> gatherer(input_queue, output_queue, MPI_COMM_WORLD, head_node, tx_threads, rx_threads);
+
+    WHEN("Data is enqueued on all ranks, and dequeued one one rank")
+    {
+      std::thread enqueue_thread(&util::Queue<TransmissableInt>::enqueueVector, &(*input_queue), std::ref(input_vector));
+
+      if(mpi::comm::rank(communicator) == head_node)
+      {
+        std::thread dequeue_thread(&util::Queue<TransmissableInt>::dequeueVector, &(*output_queue), std::ref(output_vector));
+        dequeue_thread.join();
+      }
+
+      enqueue_thread.join();
+
+      THEN("Output matches expected output (on the head node)")
+      {
+        if(mpi::comm::rank(communicator) == head_node)
+        {
+          std::sort(expected_output.begin(), expected_output.end());
+          std::sort(output_vector.begin(), output_vector.end());
+
+          bool vectors_match = (output_vector == expected_output);
+          REQUIRE(vectors_match == true);
+        }
+      }
+    }
+  }
+
+  GIVEN("A gatherer with multiple transmit and receive threads")
+  {
+    int head_node = 0;
+    unsigned tx_threads = 4;
+    unsigned rx_threads = 4;
+
+    if(mpi::comm::rank(communicator) == head_node)
+    {
+      output_queue = std::shared_ptr<util::Queue<TransmissableInt>>(new util::Queue<TransmissableInt>(output_queue_length));
+    }
+
+    util::Gatherer<TransmissableInt> gatherer(input_queue, output_queue, MPI_COMM_WORLD, head_node, tx_threads, rx_threads);
+
+    WHEN("Data is enqueued on all ranks, and dequeued one one rank")
+    {
+      std::thread enqueue_thread(&util::Queue<TransmissableInt>::enqueueVector, &(*input_queue), std::ref(input_vector));
+
+      if(mpi::comm::rank(communicator) == head_node)
+      {
+        std::thread dequeue_thread(&util::Queue<TransmissableInt>::dequeueVector, &(*output_queue), std::ref(output_vector));
+        dequeue_thread.join();
+      }
+
+      enqueue_thread.join();
+
+      THEN("Output matches expected output (on the head node)")
+      {
+        if(mpi::comm::rank(communicator) == head_node)
+        {
+          std::sort(expected_output.begin(), expected_output.end());
+          std::sort(output_vector.begin(), output_vector.end());
+
+          bool vectors_match = (output_vector == expected_output);
+          REQUIRE(vectors_match == true);
+        }
       }
     }
   }
