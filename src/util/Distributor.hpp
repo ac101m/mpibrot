@@ -53,7 +53,7 @@ namespace util
   private:
     void sendInt(int const t_destination, int const t_tag, int const t_value)
     {
-      mpi::error::check(MPI_Ssend(&t_value, 1, MPI_INT, t_destination, t_tag, m_comm_all));
+      mpi::error::check(MPI_Send(&t_value, 1, MPI_INT, t_destination, t_tag, m_comm_all));
     }
 
 
