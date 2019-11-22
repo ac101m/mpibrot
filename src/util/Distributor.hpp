@@ -19,10 +19,8 @@
 
 // Communication tags
 #define MPIBROT_UTIL_DISTRIBUTOR_TX_REQUEST_TAG 0
-#define MPIBROT_UTIL_DISTRIBUTOR_TX_RESPONSE_TAG 1
-#define MPIBROT_UTIL_DISTRIBUTOR_RX_REQUEST_TAG 2
-#define MPIBROT_UTIL_DISTRIBUTOR_RX_RESPONSE_TAG 3
-#define MPIBROT_UTIL_DISTRIBUTOR_DATA_TAG 4
+#define MPIBROT_UTIL_DISTRIBUTOR_RX_REQUEST_TAG 1
+#define MPIBROT_UTIL_DISTRIBUTOR_TAG_COUNTER_BASE 10
 
 // Stop signal
 #define MPIBROT_UTIL_DISTRIBUTOR_STOP_SIGNAL -1
@@ -48,137 +46,194 @@ namespace util
     int const m_my_signal_group;
     int const m_my_signal_handler_rank;
 
+    int const m_tx_request_tag = MPIBROT_UTIL_DISTRIBUTOR_TX_REQUEST_TAG;
+    int const m_rx_request_tag = MPIBROT_UTIL_DISTRIBUTOR_RX_REQUEST_TAG;
+
+    typedef struct
+    {
+      int rank;
+      int ack_tag;
+      int data_tag;
+      bool stop;
+    }
+    TxRequestFrame;
+
+    typedef struct
+    {
+      int rank;
+      int ack_tag;
+    }
+    RxRequestFrame;
+
+    typedef struct
+    {
+      int rank;
+    }
+    TxAckFrame;
+
+    typedef struct
+    {
+      int rank;
+      int data_tag;
+      bool stop;
+    }
+    RxAckFrame;
+
 
   // Methods
   private:
-    void sendInt(int const t_destination, int const t_tag, int const t_value)
+    void sendTxRequest(TxRequestFrame const t_request, int const t_target)
     {
-      mpi::error::check(MPI_Send(&t_value, 1, MPI_INT, t_destination, t_tag, m_comm_all));
+      mpi::error::check(MPI_Send(&t_request, sizeof(TxRequestFrame), MPI_BYTE, t_target, m_tx_request_tag, m_comm_all));
     }
 
 
-    int receiveInt(int const t_source, int const t_tag)
+    TxRequestFrame receiveTxRequest()
     {
-      int value;
+      TxRequestFrame request;
       MPI_Status status;
-      mpi::error::check(MPI_Recv(&value, 1, MPI_INT, t_source, t_tag, m_comm_all, &status));
-      return value;
+
+      mpi::error::check(MPI_Recv(&request, sizeof(TxRequestFrame), MPI_BYTE, MPI_ANY_SOURCE, m_tx_request_tag, m_comm_all, &status));
+
+      if(request.rank != status.MPI_SOURCE)
+      {
+        std::cout << "[Distributor] - Error, rank does not match source\n";
+        exit(1);
+      }
+
+      return request;
     }
 
 
-    void sendRankNumber(int const t_destination, int const t_tag)
+    void sendRxRequest(RxRequestFrame const t_request, int const t_target)
     {
-      this->sendInt(t_destination, t_tag, mpi::comm::rank(m_comm_all));
+      mpi::error::check(MPI_Send(&t_request, sizeof(RxRequestFrame), MPI_BYTE, t_target, m_rx_request_tag, m_comm_all));
     }
 
 
-    int receiveRankNumber(int const t_source, int const t_tag)
+    RxRequestFrame receiveRxRequest()
     {
-      return this->receiveInt(t_source, t_tag);
+      RxRequestFrame request;
+      MPI_Status status;
+
+      mpi::error::check(MPI_Recv(&request, sizeof(RxRequestFrame), MPI_BYTE, MPI_ANY_SOURCE, m_rx_request_tag, m_comm_all, &status));
+
+      if(request.rank != status.MPI_SOURCE)
+      {
+        std::cout << "[Distributor] - Error, rank does not match source\n";
+        exit(1);
+      }
+
+      return request;
     }
 
 
-    void sendRxRequest(int const t_signal_handler_rank)
+    void sendTxAcknowledge(TxAckFrame const t_ack, int const t_target, int const t_tag)
     {
-      this->sendRankNumber(t_signal_handler_rank, MPIBROT_UTIL_DISTRIBUTOR_RX_REQUEST_TAG);
+      mpi::error::check(MPI_Send(&t_ack, sizeof(TxAckFrame), MPI_BYTE, t_target, t_tag, m_comm_all));
     }
 
 
-    int receiveRxRequest()
+    TxAckFrame receiveTxAcknowledge(int const t_source, int const t_tag)
     {
-      return this->receiveRankNumber(MPI_ANY_SOURCE, MPIBROT_UTIL_DISTRIBUTOR_RX_REQUEST_TAG);
+      TxAckFrame ack;
+      MPI_Status status;
+
+      mpi::error::check(MPI_Recv(&ack, sizeof(TxAckFrame), MPI_BYTE, t_source, t_tag, m_comm_all, &status));
+
+      if(ack.rank != status.MPI_SOURCE)
+      {
+        std::cout << "[Distributor] - Error, rank does not match source\n";
+        exit(1);
+      }
+
+      return ack;
     }
 
 
-    void sendRxResponse(int const t_destination, int const t_value)
+    void sendRxAcknowledge(RxAckFrame const t_ack, int const t_target, int const t_tag)
     {
-      this->sendInt(t_destination, MPIBROT_UTIL_DISTRIBUTOR_RX_RESPONSE_TAG, t_value);
+      mpi::error::check(MPI_Send(&t_ack, sizeof(RxAckFrame), MPI_BYTE, t_target, t_tag, m_comm_all));
     }
 
 
-    int receiveRxResponse(int const t_source)
+    RxAckFrame receiveRxAcknowledge(int const t_source, int const t_tag)
     {
-      return this->receiveInt(t_source, MPIBROT_UTIL_DISTRIBUTOR_RX_RESPONSE_TAG);
-    }
+      RxAckFrame ack;
+      MPI_Status status;
 
+      mpi::error::check(MPI_Recv(&ack, sizeof(RxAckFrame), MPI_BYTE, t_source, t_tag, m_comm_all, &status));
 
-    void sendTxRequest(int const t_destination)
-    {
-      this->sendRankNumber(t_destination, MPIBROT_UTIL_DISTRIBUTOR_TX_REQUEST_TAG);
-    }
+      if(ack.rank != status.MPI_SOURCE)
+      {
+        std::cout << "[Distributor] - Error, rank does not match source\n";
+        exit(1);
+      }
 
-
-    void sendTxStopRequest(int const t_destination)
-    {
-      this->sendInt(t_destination, MPIBROT_UTIL_DISTRIBUTOR_TX_REQUEST_TAG, MPIBROT_UTIL_DISTRIBUTOR_STOP_SIGNAL);
-    }
-
-
-    int receiveTxRequest()
-    {
-      return this->receiveRankNumber(MPI_ANY_SOURCE, MPIBROT_UTIL_DISTRIBUTOR_TX_REQUEST_TAG);
-    }
-
-
-    void sendTxResponse(int const t_destination, int const t_response)
-    {
-      this->sendInt(t_destination, MPIBROT_UTIL_DISTRIBUTOR_TX_RESPONSE_TAG, t_response);
-    }
-
-
-    int receiveTxResponse(int const t_source)
-    {
-      return this->receiveInt(t_source, MPIBROT_UTIL_DISTRIBUTOR_TX_RESPONSE_TAG);
+      return ack;
     }
 
 
     void signalHandlerMain()
     {
-      int tx_request_rank, rx_request_rank;
+      TxRequestFrame tx_request;
+      RxRequestFrame rx_request;
 
       while(1)
       {
-        tx_request_rank = this->receiveTxRequest();
+        tx_request = this->receiveTxRequest();
 
-        if(tx_request_rank == MPIBROT_UTIL_DISTRIBUTOR_STOP_SIGNAL)
+        if(tx_request.stop == true)
         {
           break;
         }
 
-        rx_request_rank = this->receiveRxRequest();
+        rx_request = this->receiveRxRequest();
 
-        this->sendTxResponse(tx_request_rank, rx_request_rank);
-        this->sendRxResponse(rx_request_rank, tx_request_rank);
+        this->sendTxAcknowledge({rx_request.rank}, tx_request.rank, tx_request.ack_tag);
+        this->sendRxAcknowledge({tx_request.rank, tx_request.data_tag}, rx_request.rank, rx_request.ack_tag);
       }
     }
 
 
-    void receiveThreadMain(int const t_signal_handler_rank)
+    void receiveThreadMain(int const t_signal_handler_rank, int const t_ack_tag)
     {
       T rx_data;
-      int tx_rank;
+
+      RxAckFrame rx_ack;
+      RxRequestFrame const rx_request = {
+        mpi::comm::rank(m_comm_all),
+        t_ack_tag
+      };
 
       while(1)
       {
-        this->sendRxRequest(t_signal_handler_rank);
-        tx_rank = this->receiveRxResponse(t_signal_handler_rank);
+        this->sendRxRequest(rx_request, t_signal_handler_rank);
+        rx_ack = this->receiveRxAcknowledge(t_signal_handler_rank, t_ack_tag);
 
-        if(tx_rank == MPIBROT_UTIL_DISTRIBUTOR_STOP_SIGNAL)
+        if(rx_ack.stop == true)
         {
           break;
         }
 
-        rx_data.mpiReceive(tx_rank, MPIBROT_UTIL_DISTRIBUTOR_DATA_TAG, m_comm_all);
+        rx_data.mpiReceive(rx_ack.rank, rx_ack.data_tag, m_comm_all);
 
         m_output_queue->enqueue(rx_data);
       }
     }
 
 
-    void transmitThreadMain()
+    void transmitThreadMain(int const t_ack_tag, int const t_data_tag)
     {
       std::pair<int, T> tx_signal_data_pair;
-      int rx_rank;
+
+      TxAckFrame tx_ack;
+      TxRequestFrame const tx_request = {
+        mpi::comm::rank(m_comm_all),
+        t_ack_tag,
+        t_data_tag,
+        false
+      };
 
       while(1)
       {
@@ -189,9 +244,10 @@ namespace util
           break;
         }
 
-        this->sendTxRequest(m_my_signal_handler_rank);
-        rx_rank = this->receiveTxResponse(m_my_signal_handler_rank);
-        tx_signal_data_pair.second.mpiSend(rx_rank, MPIBROT_UTIL_DISTRIBUTOR_DATA_TAG, m_comm_all);
+        this->sendTxRequest(tx_request, m_my_signal_handler_rank);
+        tx_ack = this->receiveTxAcknowledge(m_my_signal_handler_rank, t_ack_tag);
+
+        tx_signal_data_pair.second.mpiSend(tx_ack.rank, t_data_tag, m_comm_all);
       }
     }
 
@@ -212,10 +268,14 @@ namespace util
       m_my_signal_group(mpi::comm::rank(m_comm_all) / m_signal_group_size),
       m_my_signal_handler_rank(m_my_signal_group * m_signal_group_size)
     {
+      int tag_counter = MPIBROT_UTIL_DISTRIBUTOR_TAG_COUNTER_BASE;
+
       // Start transmit threads
       for(unsigned i = 0; i < t_transmit_thread_count; i++)
       {
-        m_transmit_threads.push_back(std::thread(&util::Distributor<T>::transmitThreadMain, this));
+        int ack_tag = tag_counter++;
+        int data_tag = tag_counter++;
+        m_transmit_threads.push_back(std::thread(&util::Distributor<T>::transmitThreadMain, this, ack_tag, data_tag));
       }
 
       // Get vector of all ranks with signal handlers running on them
@@ -232,7 +292,8 @@ namespace util
       // pass it the rank of the signal handler it should listen to
       for(unsigned i = 0; i < signal_handler_ranks.size(); i++)
       {
-        m_receive_threads.push_back(std::thread(&util::Distributor<T>::receiveThreadMain, this, signal_handler_ranks.at(i)));
+        int ack_tag = tag_counter++;
+        m_receive_threads.push_back(std::thread(&util::Distributor<T>::receiveThreadMain, this, signal_handler_ranks.at(i), ack_tag));
       }
 
       // Start signal handlers
@@ -266,9 +327,16 @@ namespace util
       }
 
       // Send stop signals to signal handlers on this rank
+      TxRequestFrame const signal_handler_stop_signal = {
+        mpi::comm::rank(m_comm_all),
+        0,
+        0,
+        true
+      };
+
       for(unsigned i = 0; i < m_signal_handler_threads.size(); i++)
       {
-        this->sendTxStopRequest(mpi::comm::rank(m_comm_all));
+        this->sendTxRequest(signal_handler_stop_signal, mpi::comm::rank(m_comm_all));
       }
 
       // Join signal handler threads
@@ -280,10 +348,16 @@ namespace util
       // Send stop signals to receive threads
       if(mpi::comm::rank(m_comm_all) == m_my_signal_handler_rank)
       {
+        RxAckFrame const receieve_thread_stop_signal = {
+          mpi::comm::rank(m_comm_all),
+          0,
+          true
+        };
+
         for(int i = 0; i < mpi::comm::size(m_comm_all); i++)
         {
-          int rx_rank = this->receiveRxRequest();
-          this->sendRxResponse(rx_rank, MPIBROT_UTIL_DISTRIBUTOR_STOP_SIGNAL);
+          RxRequestFrame request = this->receiveRxRequest();
+          this->sendRxAcknowledge(receieve_thread_stop_signal, request.rank, request.ack_tag);
         }
       }
 
@@ -293,6 +367,7 @@ namespace util
         m_receive_threads.at(i).join();
       }
 
+      // Destroy the internal communicator
       mpi::error::check(MPI_Comm_free(&m_comm_all));
     }
   };
