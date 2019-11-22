@@ -139,21 +139,26 @@ namespace util
 
     void receiveThreadMain(int const t_data_tag)
     {
-      TxRequestFrame request;
       T tx_data;
+      TxRequestFrame tx_request;
+
+      TxAckFrame const tx_ack = {
+        mpi::comm::rank(m_comm),
+        t_data_tag
+      };
 
       while(1)
       {
-        request = this->receiveTxRequest();
+        tx_request = this->receiveTxRequest();
 
-        if(request.stop == true)
+        if(tx_request.stop == true)
         {
           break;
         }
 
-        this->sendTxAcknowledge({mpi::comm::rank(m_comm), t_data_tag}, request.rank, request.ack_tag);
+        this->sendTxAcknowledge(tx_ack, tx_request.rank, tx_request.ack_tag);
 
-        tx_data.mpiReceive(request.rank, t_data_tag, m_comm);
+        tx_data.mpiReceive(tx_request.rank, t_data_tag, m_comm);
         m_output_queue->enqueue(tx_data);
       }
     }
