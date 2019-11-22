@@ -214,7 +214,7 @@ namespace util
     {
       if(mpi::comm::rank(m_comm) == m_head_node)
       {
-        TxRequestFrame const stop_signal = {
+        TxRequestFrame const tx_stop_signal = {
           mpi::comm::rank(m_comm),
           0,
           true
@@ -222,7 +222,7 @@ namespace util
 
         for(unsigned i = 0; i < m_receive_threads.size(); i++)
         {
-          this->sendTxRequest(stop_signal);
+          this->sendTxRequest(tx_stop_signal);
         }
 
         for(unsigned i = 0; i < m_receive_threads.size(); i++)
