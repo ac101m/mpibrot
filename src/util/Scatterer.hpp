@@ -179,6 +179,9 @@ namespace util
       m_head_node(t_head_node),
       m_rx_request_tag(MPIBROT_UTIL_SCATTERER_RX_REQUEST_TAG)
     {
+      // Constructor muct be called collectively
+      mpi::error::check(MPI_Barrier(m_comm));
+
       int tag_counter = MPIBROT_UTIL_SCATTERER_TAG_COUNTER_BASE;
 
       if(mpi::comm::rank(m_comm) != m_head_node)
@@ -217,6 +220,9 @@ namespace util
 
     ~Scatterer()
     {
+      // Destructor must be called collectively
+      mpi::error::check(MPI_Barrier(m_comm));
+
       if(mpi::comm::rank(m_comm) == m_head_node)
       {
         for(unsigned i = 0; i < m_transmit_threads.size(); i++)
