@@ -18,6 +18,7 @@ SCENARIO(
   unsigned output_queue_length = 4;
 
   int head_node = 0;
+  MPI_Comm communicator = MPI_COMM_SELF;
 
   std::shared_ptr<util::Queue<TransmissableInt>> input_queue(new util::Queue<TransmissableInt>(input_queue_length));
   std::shared_ptr<util::Queue<TransmissableInt>> output_queue(new util::Queue<TransmissableInt>(output_queue_length));
@@ -37,7 +38,7 @@ SCENARIO(
     unsigned tx_threads = 1;
     unsigned rx_threads = 1;
 
-    util::Gatherer<TransmissableInt> gatherer(input_queue, output_queue, MPI_COMM_SELF, head_node, tx_threads, rx_threads);
+    util::Gatherer<TransmissableInt> gatherer(input_queue, output_queue, communicator, head_node, tx_threads, rx_threads);
 
     WHEN("A vector of transmissable items is passed through the gatherer")
     {
@@ -63,7 +64,7 @@ SCENARIO(
     unsigned tx_threads = 4;
     unsigned rx_threads = 4;
 
-    util::Gatherer<TransmissableInt> gatherer(input_queue, output_queue, MPI_COMM_SELF, head_node, tx_threads, rx_threads);
+    util::Gatherer<TransmissableInt> gatherer(input_queue, output_queue, communicator, head_node, tx_threads, rx_threads);
 
     WHEN("A vector of transmissable items is passed through the gatherer")
     {
