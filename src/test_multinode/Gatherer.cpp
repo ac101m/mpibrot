@@ -87,7 +87,7 @@ SCENARIO(
 
 
 SCENARIO(
-  "[Gatherer] - Multi rank test")
+  "[Gatherer] - Collective test")
 {
   unsigned input_queue_length = 4;
   unsigned output_queue_length = 4;
