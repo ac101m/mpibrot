@@ -179,6 +179,8 @@ namespace util
       m_head_node(t_head_node),
       m_tx_request_tag(MPIBROT_UTIL_GATHERER_TX_REQUEST_TAG)
     {
+      mpi::error::check(MPI_Barrier(m_comm));
+
       int tag_counter = MPIBROT_UTIL_GATHERER_TAG_COUNTER_BASE;
 
       if(mpi::comm::rank(m_comm) != m_head_node)
@@ -217,6 +219,9 @@ namespace util
 
     ~Gatherer()
     {
+      // Destructor must be called collectively
+      mpi::error::check(MPI_Barrier(m_comm));
+
       if(mpi::comm::rank(m_comm) == m_head_node)
       {
         TxRequestFrame const tx_stop_signal = {
