@@ -31,7 +31,7 @@ SCENARIO(
     input_vector[i] = rand();
   }
 
-  GIVEN("A distributor with one send and receive thread")
+  GIVEN("A distributor with one send and one receive thread")
   {
     unsigned signal_groups = 1;
     unsigned tx_threads = 1;
