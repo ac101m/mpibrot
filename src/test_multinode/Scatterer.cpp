@@ -123,8 +123,8 @@ SCENARIO(
     unsigned tx_threads = 1;
     unsigned rx_threads = 1;
 
-    util::Gatherer<TransmissableInt> gatherer(intermediate_queue, output_queue, communicator, head_node);
     util::Scatterer<TransmissableInt> scatterer(input_queue, intermediate_queue, communicator, head_node, tx_threads, rx_threads);
+    util::Gatherer<TransmissableInt> gatherer(intermediate_queue, output_queue, communicator, head_node);
 
     WHEN("A vector of transmissable items is passed through the scatterer")
     {
