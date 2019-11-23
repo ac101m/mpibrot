@@ -93,10 +93,11 @@ SCENARIO(
   unsigned output_queue_length = 4;
 
   int head_node = 0;
+  MPI_Comm communicator = MPI_COMM_WORLD;
+
   std::shared_ptr<util::Queue<TransmissableInt>> input_queue(new util::Queue<TransmissableInt>(input_queue_length));
   std::shared_ptr<util::Queue<TransmissableInt>> output_queue(nullptr);
 
-  MPI_Comm communicator = MPI_COMM_WORLD;
 
   unsigned test_vector_length = 64;
 
