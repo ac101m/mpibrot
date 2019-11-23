@@ -125,7 +125,7 @@ SCENARIO(
       output_queue = std::shared_ptr<util::Queue<TransmissableInt>>(new util::Queue<TransmissableInt>(output_queue_length));
     }
 
-    util::Gatherer<TransmissableInt> gatherer(input_queue, output_queue, MPI_COMM_WORLD, head_node, tx_threads, rx_threads);
+    util::Gatherer<TransmissableInt> gatherer(input_queue, output_queue, communicator, head_node, tx_threads, rx_threads);
 
     WHEN("Data is enqueued on all ranks, and dequeued one one rank")
     {
@@ -163,7 +163,7 @@ SCENARIO(
       output_queue = std::shared_ptr<util::Queue<TransmissableInt>>(new util::Queue<TransmissableInt>(output_queue_length));
     }
 
-    util::Gatherer<TransmissableInt> gatherer(input_queue, output_queue, MPI_COMM_WORLD, head_node, tx_threads, rx_threads);
+    util::Gatherer<TransmissableInt> gatherer(input_queue, output_queue, communicator, head_node, tx_threads, rx_threads);
 
     WHEN("Data is enqueued on all ranks, and dequeued one one rank")
     {
