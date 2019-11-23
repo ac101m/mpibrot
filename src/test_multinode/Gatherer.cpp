@@ -17,6 +17,8 @@ SCENARIO(
   unsigned input_queue_length = 4;
   unsigned output_queue_length = 4;
 
+  int head_node = 0;
+
   std::shared_ptr<util::Queue<TransmissableInt>> input_queue(new util::Queue<TransmissableInt>(input_queue_length));
   std::shared_ptr<util::Queue<TransmissableInt>> output_queue(new util::Queue<TransmissableInt>(output_queue_length));
 
@@ -32,7 +34,6 @@ SCENARIO(
 
   GIVEN("A gatherer with one transmit and one receive thread")
   {
-    unsigned head_node = 0;
     unsigned tx_threads = 1;
     unsigned rx_threads = 1;
 
@@ -59,7 +60,6 @@ SCENARIO(
 
   GIVEN("A gatherer with multiple transmit and receive threads")
   {
-    unsigned head_node = 0;
     unsigned tx_threads = 4;
     unsigned rx_threads = 4;
 
