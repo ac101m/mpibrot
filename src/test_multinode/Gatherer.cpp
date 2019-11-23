@@ -98,6 +98,10 @@ SCENARIO(
   std::shared_ptr<util::Queue<TransmissableInt>> input_queue(new util::Queue<TransmissableInt>(input_queue_length));
   std::shared_ptr<util::Queue<TransmissableInt>> output_queue(nullptr);
 
+  if(mpi::comm::rank(communicator) == head_node)
+  {
+    output_queue = std::shared_ptr<util::Queue<TransmissableInt>>(new util::Queue<TransmissableInt>(output_queue_length));
+  }
 
   unsigned test_vector_length = 64;
 
@@ -119,11 +123,6 @@ SCENARIO(
   {
     unsigned tx_threads = 1;
     unsigned rx_threads = 1;
-
-    if(mpi::comm::rank(communicator) == head_node)
-    {
-      output_queue = std::shared_ptr<util::Queue<TransmissableInt>>(new util::Queue<TransmissableInt>(output_queue_length));
-    }
 
     util::Gatherer<TransmissableInt> gatherer(input_queue, output_queue, communicator, head_node, tx_threads, rx_threads);
 
@@ -157,11 +156,6 @@ SCENARIO(
   {
     unsigned tx_threads = 4;
     unsigned rx_threads = 4;
-
-    if(mpi::comm::rank(communicator) == head_node)
-    {
-      output_queue = std::shared_ptr<util::Queue<TransmissableInt>>(new util::Queue<TransmissableInt>(output_queue_length));
-    }
 
     util::Gatherer<TransmissableInt> gatherer(input_queue, output_queue, communicator, head_node, tx_threads, rx_threads);
 
