@@ -17,6 +17,7 @@ SCENARIO(
   unsigned input_queue_length = 4;
   unsigned output_queue_length = 4;
   unsigned head_node = 0;
+  MPI_Comm communicator = MPI_COMM_SELF;
 
   std::shared_ptr<util::Queue<TransmissableInt>> input_queue(new util::Queue<TransmissableInt>(input_queue_length));
   std::shared_ptr<util::Queue<TransmissableInt>> output_queue(new util::Queue<TransmissableInt>(output_queue_length));
@@ -36,7 +37,7 @@ SCENARIO(
     unsigned tx_threads = 1;
     unsigned rx_threads = 1;
 
-    util::Scatterer<TransmissableInt> scatterer(input_queue, output_queue, MPI_COMM_SELF, head_node, tx_threads, rx_threads);
+    util::Scatterer<TransmissableInt> scatterer(input_queue, output_queue, communicator, head_node, tx_threads, rx_threads);
 
     WHEN("A vector of tranmissable items is passed through the scatterer")
     {
@@ -62,7 +63,7 @@ SCENARIO(
     unsigned tx_threads = 4;
     unsigned rx_threads = 4;
 
-    util::Scatterer<TransmissableInt> scatterer(input_queue, output_queue, MPI_COMM_SELF, head_node, tx_threads, rx_threads);
+    util::Scatterer<TransmissableInt> scatterer(input_queue, output_queue, communicator, head_node, tx_threads, rx_threads);
 
     WHEN("A vector of transmissable items is passed through the scatterer")
     {
