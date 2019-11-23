@@ -16,7 +16,8 @@ SCENARIO(
 {
   unsigned input_queue_length = 4;
   unsigned output_queue_length = 4;
-  unsigned head_node = 0;
+
+  int head_node = 0;
   MPI_Comm communicator = MPI_COMM_SELF;
 
   std::shared_ptr<util::Queue<TransmissableInt>> input_queue(new util::Queue<TransmissableInt>(input_queue_length));
