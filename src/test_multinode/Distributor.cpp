@@ -58,7 +58,7 @@ SCENARIO(
     }
   }
 
-  GIVEN("A distributor with multiple send and receive thread")
+  GIVEN("A distributor with multiple send and receive threads")
   {
     unsigned signal_groups = 1;
     unsigned tx_threads = 4;
