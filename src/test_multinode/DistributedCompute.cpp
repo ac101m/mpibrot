@@ -169,10 +169,11 @@ SCENARIO(
     WHEN("ack(m, n) is computed across multiple ranks using scatterer, worker & gatherer")
     {
       unsigned worker_threads = 12;
+      unsigned scatter_gather_threads = 1;
 
-      util::Scatterer<AckermannInput> scatterer(input_queue, local_input_queue, communicator);
-      util::Gatherer<AckermannOutput> gatherer(local_output_queue, output_queue, communicator);
+      util::Scatterer<AckermannInput> scatterer(input_queue, local_input_queue, communicator, head_rank, scatter_gather_threads, 1);
       AckermannWorker worker(local_input_queue, local_output_queue, worker_threads);
+      util::Gatherer<AckermannOutput> gatherer(local_output_queue, output_queue, communicator, head_rank, 1, scatter_gather_threads);
 
       if(mpi::comm::rank(communicator) == head_rank)
       {
