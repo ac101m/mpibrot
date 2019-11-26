@@ -5,6 +5,7 @@
 // Internal
 #include "test_multinode/TransmissableInt.hpp"
 #include "util/Distributor.hpp"
+#include "util/Gatherer.hpp"
 
 // Standard
 #include <vector>
@@ -86,33 +87,73 @@ SCENARIO(
   }
 }
 
-/*
+
 SCENARIO(
-  "[Distributor] - Parallel enqueue/dequeue test")
+  "[Distributor] - Collective test")
 {
   unsigned input_queue_length = 4;
+  unsigned intermediate_queue_length = 4;
   unsigned output_queue_length = 4;
 
+  int head_rank = 0;
+  MPI_Comm communicator = MPI_COMM_WORLD;
+
   std::shared_ptr<util::Queue<TransmissableInt>> input_queue(new util::Queue<TransmissableInt>(input_queue_length));
-  std::shared_ptr<util::Queue<TransmissableInt>> output_queue(new util::Queue<TransmissableInt>(output_queue_length));
+  std::shared_ptr<util::Queue<TransmissableInt>> intermediate_queue(new util::Queue<TransmissableInt>(intermediate_queue_length));
+  std::shared_ptr<util::Queue<TransmissableInt>> output_queue(nullptr);
 
-  mpi::Communicator communicator = mpi::Communicator::world();
-
-  util::Distributor<TransmissableInt> distributor(input_queue, output_queue, 1, 1, 1, communicator);
-
-  GIVEN("A vector of test items")
+  if(mpi::comm::rank(communicator) == head_rank)
   {
-    unsigned test_vector_length = 65536;
+    output_queue = std::shared_ptr<util::Queue<TransmissableInt>>(new util::Queue<TransmissableInt>(output_queue_length));
+  }
 
-    WHEN("The data is enqueued on one node")
+  unsigned test_vector_length = 64;
+
+  std::vector<TransmissableInt> input_vector(test_vector_length);
+  std::vector<TransmissableInt> output_vector(test_vector_length * mpi::comm::size(communicator));
+  std::vector<TransmissableInt> expected_output(test_vector_length * mpi::comm::size(communicator));
+
+  for(unsigned i = 0; i < input_vector.size(); i++)
+  {
+    input_vector[i] = (mpi::comm::rank(communicator) * input_vector.size()) + i;
+  }
+
+  for(unsigned i = 0; i < expected_output.size(); i++)
+  {
+    expected_output[i] = i;
+  }
+
+  GIVEN("A distributor with a single signal handler and transmit thread")
+  {
+    unsigned signal_group_count = 1;
+    unsigned transmit_thread_count = 1;
+    unsigned signal_handler_thread_count = 1;
+
+    util::Distributor<TransmissableInt> distributor(input_queue, intermediate_queue, communicator, signal_group_count, transmit_thread_count, signal_handler_thread_count);
+    util::Gatherer<TransmissableInt> gatherer(intermediate_queue, output_queue, communicator);
+
+    WHEN("Data is passed through the distributor on all nodes")
     {
+      std::thread enqueue_thread(&util::Queue<TransmissableInt>::enqueueVector, &(*input_queue), std::ref(input_vector));
 
-
-      THEN("Input data matches output data")
+      if(mpi::comm::rank(communicator) == head_rank)
       {
+        std::thread dequeue_thread(&util::Queue<TransmissableInt>::dequeueVector, &(*output_queue), std::ref(output_vector));
+        dequeue_thread.join();
+      }
 
+      enqueue_thread.join();
+
+      THEN("Values are preserved")
+      {
+        if(mpi::comm::rank(communicator) == head_rank)
+        {
+          std::sort(output_vector.begin(), output_vector.end());
+
+          bool vectors_match = (output_vector == expected_output);
+          REQUIRE(vectors_match == true);
+        }
       }
     }
   }
 }
-*/
