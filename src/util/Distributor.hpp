@@ -268,6 +268,8 @@ namespace util
       m_my_signal_group(mpi::comm::rank(m_comm_all) / m_signal_group_size),
       m_my_signal_handler_rank(m_my_signal_group * m_signal_group_size)
     {
+      mpi::error::check(MPI_Barrier(m_comm_all));
+
       int tag_counter = MPIBROT_UTIL_DISTRIBUTOR_TAG_COUNTER_BASE;
 
       // Start transmit threads
@@ -314,6 +316,8 @@ namespace util
 
     ~Distributor()
     {
+      mpi::error::check(MPI_Barrier(m_comm_all));
+
       // Send stop signals to transmit threads
       for(unsigned i = 0; i < m_transmit_threads.size(); i++)
       {
