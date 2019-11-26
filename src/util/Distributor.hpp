@@ -141,12 +141,6 @@ namespace util
 
       mpi::error::check(MPI_Recv(&ack, sizeof(TxAckFrame), MPI_BYTE, t_source, t_tag, m_comm_all, &status));
 
-      if(ack.rank != status.MPI_SOURCE)
-      {
-        std::cout << "[Distributor] - Error, rank does not match source\n";
-        exit(1);
-      }
-
       return ack;
     }
 
@@ -163,12 +157,6 @@ namespace util
       MPI_Status status;
 
       mpi::error::check(MPI_Recv(&ack, sizeof(RxAckFrame), MPI_BYTE, t_source, t_tag, m_comm_all, &status));
-
-      if(ack.rank != status.MPI_SOURCE)
-      {
-        std::cout << "[Distributor] - Error, rank does not match source\n";
-        exit(1);
-      }
 
       return ack;
     }
