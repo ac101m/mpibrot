@@ -53,7 +53,6 @@ namespace util
     {
       int rank;
       int ack_tag;
-      int data_tag;
       bool stop;
     }
     TxRequestFrame;
@@ -62,19 +61,20 @@ namespace util
     {
       int rank;
       int ack_tag;
+      int data_tag;
     }
     RxRequestFrame;
 
     typedef struct
     {
       int rank;
+      int data_tag;
     }
     TxAckFrame;
 
     typedef struct
     {
       int rank;
-      int data_tag;
       bool stop;
     }
     RxAckFrame;
@@ -178,20 +178,21 @@ namespace util
 
         rx_request = this->receiveRxRequest();
 
-        this->sendTxAcknowledge({rx_request.rank}, tx_request.rank, tx_request.ack_tag);
-        this->sendRxAcknowledge({tx_request.rank, tx_request.data_tag}, rx_request.rank, rx_request.ack_tag);
+        this->sendTxAcknowledge({rx_request.rank, rx_request.data_tag}, tx_request.rank, tx_request.ack_tag);
+        this->sendRxAcknowledge({tx_request.rank}, rx_request.rank, rx_request.ack_tag);
       }
     }
 
 
-    void receiveThreadMain(int const t_signal_handler_rank, int const t_ack_tag)
+    void receiveThreadMain(int const t_signal_handler_rank, int const t_ack_tag, int const t_data_tag)
     {
       T rx_data;
 
       RxAckFrame rx_ack;
       RxRequestFrame const rx_request = {
         mpi::comm::rank(m_comm_all),
-        t_ack_tag
+        t_ack_tag,
+        t_data_tag
       };
 
       while(1)
@@ -204,14 +205,14 @@ namespace util
           break;
         }
 
-        rx_data.mpiReceive(rx_ack.rank, rx_ack.data_tag, m_comm_all);
+        rx_data.mpiReceive(rx_ack.rank, t_data_tag, m_comm_all);
 
         m_output_queue->enqueue(rx_data);
       }
     }
 
 
-    void transmitThreadMain(int const t_ack_tag, int const t_data_tag)
+    void transmitThreadMain(int const t_ack_tag)
     {
       std::pair<int, T> tx_signal_data_pair;
 
@@ -219,7 +220,6 @@ namespace util
       TxRequestFrame const tx_request = {
         mpi::comm::rank(m_comm_all),
         t_ack_tag,
-        t_data_tag,
         false
       };
 
@@ -235,7 +235,7 @@ namespace util
         this->sendTxRequest(tx_request, m_my_signal_handler_rank);
         tx_ack = this->receiveTxAcknowledge(m_my_signal_handler_rank, t_ack_tag);
 
-        tx_signal_data_pair.second.mpiSend(tx_ack.rank, t_data_tag, m_comm_all);
+        tx_signal_data_pair.second.mpiSend(tx_ack.rank, tx_ack.data_tag, m_comm_all);
       }
     }
 
@@ -264,8 +264,7 @@ namespace util
       for(unsigned i = 0; i < t_transmit_thread_count; i++)
       {
         int ack_tag = tag_counter++;
-        int data_tag = tag_counter++;
-        m_transmit_threads.push_back(std::thread(&util::Distributor<T>::transmitThreadMain, this, ack_tag, data_tag));
+        m_transmit_threads.push_back(std::thread(&util::Distributor<T>::transmitThreadMain, this, ack_tag));
       }
 
       // Get vector of all ranks with signal handlers running on them
@@ -283,7 +282,8 @@ namespace util
       for(unsigned i = 0; i < signal_handler_ranks.size(); i++)
       {
         int ack_tag = tag_counter++;
-        m_receive_threads.push_back(std::thread(&util::Distributor<T>::receiveThreadMain, this, signal_handler_ranks.at(i), ack_tag));
+        int data_tag = tag_counter++;
+        m_receive_threads.push_back(std::thread(&util::Distributor<T>::receiveThreadMain, this, signal_handler_ranks[i], ack_tag, data_tag));
       }
 
       // Start signal handlers
@@ -322,7 +322,6 @@ namespace util
       TxRequestFrame const signal_handler_stop_signal = {
         mpi::comm::rank(m_comm_all),
         0,
-        0,
         true
       };
 
@@ -342,7 +341,6 @@ namespace util
       {
         RxAckFrame const receieve_thread_stop_signal = {
           mpi::comm::rank(m_comm_all),
-          0,
           true
         };
 
