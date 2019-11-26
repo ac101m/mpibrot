@@ -148,6 +148,7 @@ SCENARIO(
       {
         if(mpi::comm::rank(communicator) == head_rank)
         {
+          std::sort(expected_output.begin(), expected_output.end());
           std::sort(output_vector.begin(), output_vector.end());
 
           bool vectors_match = (output_vector == expected_output);
