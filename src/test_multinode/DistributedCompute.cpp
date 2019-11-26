@@ -112,7 +112,7 @@ public:
 SCENARIO(
   "Distributed compute test")
 {
-  unsigned queue_length = 16;
+  unsigned queue_length = 1024;
 
   int head_rank = 0;
   MPI_Comm communicator = MPI_COMM_WORLD;
