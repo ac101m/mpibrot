@@ -131,13 +131,13 @@ SCENARIO(
 
   GIVEN("A vector of {m, n}")
   {
-    unsigned m_min = 2;
+    unsigned m_min = 3;
     unsigned m_max = 3;
 
-    unsigned n_min = 8;
-    unsigned n_max = 10;
+    unsigned n_min = 5;
+    unsigned n_max = 8;
 
-    unsigned test_vector_length = 8192;
+    unsigned test_vector_length = 16384;
 
     std::vector<AckermannInput> input_vector(test_vector_length);
     std::vector<AckermannOutput> output_vector(test_vector_length);
