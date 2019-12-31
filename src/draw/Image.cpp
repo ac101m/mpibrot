@@ -9,7 +9,8 @@
 // Initialise the things
 Image::Image(unsigned const width, unsigned const height) :
   GLT::Texture2D(0, GL_RGB, width, height, GL_RGB, GL_UNSIGNED_BYTE, NULL),
-  Buffer2D(width, height) {
+  Buffer2D(width, height)
+{
 
   // Vertex positions, UVs and indices
   std::vector<GLT::vertex_t> const vertices = {
@@ -26,11 +27,12 @@ Image::Image(unsigned const width, unsigned const height) :
 
 
 // Resize the internal texture
-void Image::Resize(unsigned const width, unsigned const height) {
+void Image::Resize(unsigned const width, unsigned const height)
+{
   this->Bind();
 
   // Update data size
-  Buffer2D<pixel_t>::Resize(width, height);
+  Buffer2D<Pixel>::Resize(width, height);
 
   // Update texture
   glTexImage2D(
@@ -55,9 +57,12 @@ void Image::Resize(unsigned const width, unsigned const height) {
 
 
 // Random orbit texture data
-void Image::Random() {
-  for(unsigned j = 0; j < this->height; j++) {
-    for(unsigned i = 0; i < this->width; i++) {
+void Image::Random()
+{
+  for(unsigned j = 0; j < this->height; j++)
+  {
+    for(unsigned i = 0; i < this->width; i++)
+    {
       unsigned r = rand();
       this->Get(i, j).r = r % 255;
       this->Get(i, j).g = (r >> 8) % 255;
@@ -68,7 +73,8 @@ void Image::Random() {
 
 
 // Update the internal texture
-void Image::Update() {
+void Image::Update()
+{
   this->Bind();
 
   // Update texture
@@ -94,7 +100,8 @@ void Image::Update() {
 
 
 // Draw method
-void Image::Draw(GLT::ShaderProgram& shader) {
+void Image::Draw(GLT::ShaderProgram& shader)
+{
   shader.Use();
   glActiveTexture(GL_TEXTURE0);
 

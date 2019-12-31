@@ -21,18 +21,18 @@ typedef struct {
   unsigned char r;
   unsigned char g;
   unsigned char b;
-} pixel_t;
+} Pixel;
 
 
 // Contains a texture representative
-class Image : public GLT::Texture2D, public Buffer2D<pixel_t> {
+class Image : public GLT::Texture2D, public Buffer2D<Pixel>
+{
 private:
 
   // Vertex data
   GLT::VertexArray vertexArray;
 
 public:
-
   Image();
   Image(unsigned const width, unsigned const height);
 
