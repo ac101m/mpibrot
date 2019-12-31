@@ -90,7 +90,8 @@ void Image::Update()
     this->data.data());
 
   // Check for boo-boos
-  if(glGetError() != GL_NO_ERROR) {
+  if(glGetError() != GL_NO_ERROR)
+  {
     std::cerr << "ERROR: Failed to resize iteration map texture\n";
     exit(1);
   }
@@ -117,6 +118,6 @@ void Image::Draw(GLT::ShaderProgram& shader)
     GL_UNSIGNED_INT, 0);
   this->vertexArray.Unbind();
 
-  // Unbind orbit texture
+  // Unbind texture
   this->Unbind();
 }
