@@ -1,10 +1,10 @@
 
 // Internal
-#include "util/Options.hpp"
 #include "draw/Image.hpp"
 #include "compute/SimpleBrot.hpp"
 
 // External
+#include "optparse.hpp"
 #include "GLT/Window.hpp"
 
 // Standard
@@ -12,9 +12,25 @@
 #include <iostream>
 
 
+// Generate option parser
+OptionParser genOptionParser(int argc, char** argv) {
+  OptionParser opt(
+    argc, argv,
+    "Parallel mandelbrot zoom generator for clusters - client");
+
+  // Viewing window resolution option
+  opt.Add(Option(
+    "window-resolution", 'w', ARG_TYPE_INT,
+    "Screen resolution for window",
+    {"1024", "768"}));
+
+  return opt;
+}
+
+
 // Lets get this show on the road
 int main(int argc, char **argv) {
-  OptionParser opt = genClientOptionParser(argc, argv);
+  OptionParser opt = genOptionParser(argc, argv);
 
   // Get window dimensions
   std::vector<int> wSize = opt.Get("window-resolution");
