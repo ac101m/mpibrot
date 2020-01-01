@@ -13,7 +13,8 @@
 
 
 // Generate option parser
-OptionParser genOptionParser(int argc, char** argv) {
+OptionParser genOptionParser(int argc, char** argv)
+{
   OptionParser opt(
     argc, argv,
     "Parallel mandelbrot zoom generator for clusters - client");
@@ -39,12 +40,14 @@ OptionParser genOptionParser(int argc, char** argv) {
 
 
 // Lets get this show on the road
-int main(int argc, char **argv) {
+int main(int argc, char **argv)
+{
   OptionParser opt = genOptionParser(argc, argv);
 
   // Get window dimensions
   std::vector<int> wSize = opt.Get("window-resolution");
-  if(wSize.size() < 2) {
+  if(wSize.size() < 2)
+  {
     std::cerr << "ERROR, Please specify both window width and height\n";
     exit(1);
   }
@@ -100,8 +103,9 @@ int main(int argc, char **argv) {
   int port = opt.Get("port");
 
   // Draw loop
-  while(!window.ShouldClose()) {
-    image.Draw(shader);
+  while(!window.ShouldClose())
+  {
+    image.draw(shader);
     window.Refresh();
   }
 
