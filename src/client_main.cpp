@@ -24,6 +24,16 @@ OptionParser genOptionParser(int argc, char** argv) {
     "Screen resolution for window",
     {"1024", "768"}));
 
+  opt.Add(Option(
+    "port", 'p', ARG_TYPE_INT,
+    "Port for server connection",
+    {"9901"}));
+
+  opt.Add(Option(
+    "host", 'h', ARG_TYPE_STRING,
+    "Address of host compute server",
+    {"127.0.0.1"}));
+
   return opt;
 }
 
@@ -85,6 +95,9 @@ int main(int argc, char **argv) {
 
   // Update internal opengl texture
   image.Update();
+
+  std::string host = opt.Get("host");
+  int port = opt.Get("port");
 
   // Draw loop
   while(!window.ShouldClose()) {
