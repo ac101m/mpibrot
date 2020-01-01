@@ -9,7 +9,8 @@
 
 
 // Server options
-OptionParser genOptionParser(int argc, char** argv) {
+OptionParser genOptionParser(int argc, char** argv)
+{
   OptionParser opt(
     argc, argv,
     "Parallel mandelbrot zoom generator for clusters - server");
@@ -23,7 +24,8 @@ OptionParser genOptionParser(int argc, char** argv) {
 }
 
 
-int main(int argc, char** argv) {
+int main(int argc, char** argv)
+{
   OptionParser opt = genOptionParser(argc, argv);
   std::cout << "Hello world\n";
   return 0;
