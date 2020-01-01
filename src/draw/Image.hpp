@@ -17,11 +17,13 @@
 
 
 // Struct for pixel data
-typedef struct {
+typedef struct
+{
   unsigned char r;
   unsigned char g;
   unsigned char b;
-} Pixel;
+}
+Pixel;
 
 
 // Contains a texture representative
