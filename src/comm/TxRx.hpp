@@ -12,7 +12,7 @@
 // Transmit arbitrary object
 template<class T>
 void Transmit(T const& data, boost::asio::ip::tcp::socket& socket) {
-  write(socket, buffer(&data, sizeof(T)));
+  write(socket, boost::asio::buffer(&data, sizeof(T)));
 }
 
 
@@ -20,7 +20,7 @@ void Transmit(T const& data, boost::asio::ip::tcp::socket& socket) {
 template<class T>
 T Recieve(boost::asio::ip::tcp::socket& socket) {
   T data;
-  read(socket, buffer(&data, sizeof(T)));
+  read(socket, boost::asio::buffer(&data, sizeof(T)));
   return data;
 }
 
@@ -29,7 +29,7 @@ T Recieve(boost::asio::ip::tcp::socket& socket) {
 template<class T>
 void Transmit(std::vector<T> const& data, boost::asio::ip::tcp::socket& socket) {
   Transmit<unsigned>(data.size(), socket);
-  write(socket, buffer(data.data(), sizeof(T) * data.size()));
+  write(socket, boost::asio::buffer(data.data(), sizeof(T) * data.size()));
 }
 
 
@@ -46,7 +46,7 @@ void Recieve(std::vector<T>* data, boost::asio::ip::tcp::socket& socket) {
   }
 
   // Read storage back
-  read(socket, buffer(data->data(), sizeof(T)) * elementCount);
+  read(socket, boost::asio::buffer(data->data(), sizeof(T)) * elementCount);
   return data;
 }
 
