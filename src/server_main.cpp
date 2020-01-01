@@ -17,7 +17,7 @@ OptionParser genOptionParser(int argc, char** argv) {
   opt.Add(Option(
     "port", 'p', ARG_TYPE_INT,
     "Port for server to listen on",
-    {"978"}));
+    {"9901"}));
 
   return opt;
 }
