@@ -14,10 +14,9 @@ OptionParser genOptionParser(int argc, char** argv) {
     argc, argv,
     "Parallel mandelbrot zoom generator for clusters - server");
 
-  // Viewing window resolution option
   opt.Add(Option(
     "port", 'p', ARG_TYPE_INT,
-    "Port to host server on",
+    "Port for server to listen on",
     {"978"}));
 
   return opt;
