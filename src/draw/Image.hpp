@@ -36,16 +36,16 @@ public:
   Image();
   Image(unsigned const width, unsigned const height);
 
-  void Resize(unsigned const width, unsigned const height);
+  void resize(unsigned const width, unsigned const height);
 
   // Fill with random pixels
-  void Random();
+  void random();
 
   // Update the internal texture object with new data
-  void Update();
+  void update();
 
   // Draw method
-  void Draw(GLT::ShaderProgram& shader);
+  void draw(GLT::ShaderProgram& shader);
 };
 
 

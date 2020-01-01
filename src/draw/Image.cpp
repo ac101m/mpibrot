@@ -27,7 +27,7 @@ Image::Image(unsigned const width, unsigned const height) :
 
 
 // Resize the internal texture
-void Image::Resize(unsigned const width, unsigned const height)
+void Image::resize(unsigned const width, unsigned const height)
 {
   this->Bind();
 
@@ -57,7 +57,7 @@ void Image::Resize(unsigned const width, unsigned const height)
 
 
 // Random orbit texture data
-void Image::Random()
+void Image::random()
 {
   for(unsigned j = 0; j < this->height; j++)
   {
@@ -73,7 +73,7 @@ void Image::Random()
 
 
 // Update the internal texture
-void Image::Update()
+void Image::update()
 {
   this->Bind();
 
@@ -101,7 +101,7 @@ void Image::Update()
 
 
 // Draw method
-void Image::Draw(GLT::ShaderProgram& shader)
+void Image::draw(GLT::ShaderProgram& shader)
 {
   shader.Use();
   glActiveTexture(GL_TEXTURE0);
