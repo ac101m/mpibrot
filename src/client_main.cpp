@@ -31,7 +31,7 @@ OptionParser genOptionParser(int argc, char** argv)
     {"9901"}));
 
   opt.Add(Option(
-    "host", 'h', ARG_TYPE_STRING,
+    "host", 'H', ARG_TYPE_STRING,
     "Address of host compute server",
     {"127.0.0.1"}));
 
