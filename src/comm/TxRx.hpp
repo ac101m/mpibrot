@@ -18,7 +18,7 @@ void Transmit(T const& data, boost::asio::ip::tcp::socket& socket) {
 
 // Recieve arbirary object
 template<class T>
-T Recieve(boost::asio::ip::tcp::socket& socket) {
+T Receive(boost::asio::ip::tcp::socket& socket) {
   T data;
   read(socket, boost::asio::buffer(&data, sizeof(T)));
   return data;
@@ -35,10 +35,10 @@ void Transmit(std::vector<T> const& data, boost::asio::ip::tcp::socket& socket) 
 
 // Recieve arbitrary object vector
 template<class T>
-void Recieve(std::vector<T>* data, boost::asio::ip::tcp::socket& socket) {
+void Receive(std::vector<T>* data, boost::asio::ip::tcp::socket& socket) {
 
   // Get number of elements to recieve first
-  unsigned elementCount = Recieve<unsigned>(socket);
+  unsigned elementCount = Receive<unsigned>(socket);
 
   // If neccessary, resize the vector
   if(data->size() != elementCount) {
